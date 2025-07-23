@@ -19,7 +19,7 @@ def	sort_dict():
         ('White', '1975'),
         ('Frusciante', '1970'),
         ('Thompson', '1949'),
-        ('Burton', '1939')
+        ('Burton', '1939'),
 	}
 
 	my_dict_by_year = {}

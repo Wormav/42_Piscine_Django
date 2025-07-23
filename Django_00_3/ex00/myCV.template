@@ -1,0 +1,19 @@
+    <h1 style="color: #2c3e50; margin-bottom: 10px;">My CV</h1>
+
+    <section style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px #eee;">
+        <h2 style="color: #2980b9; margin-top: 0;">Personal information</h2>
+        <p>"-Who are you?<br>
+        -A {name}!"</p>
+
+        <p>"-What is your first name?<br>
+        -My first name is {first_name}!"</p>
+
+        <p>"-What is your last name?<br>
+        -My last name is {last_name}!"</p>
+
+        <p>"-How old are you?<br>
+        -I am {age} years old!"</p>
+
+        <p>"-What is your profession?<br>
+        -I work as a {profession}!"</p>
+    </section>
