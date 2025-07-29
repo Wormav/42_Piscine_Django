@@ -11,7 +11,6 @@ def request_wikipedia(keyword: str) -> dict:
         "explaintext": True,
         "redirects": 1,
         "titles": keyword
-        # On retire "exintro": True
     }
     response = requests.get(url, params=params)
     data = response.json()
@@ -55,11 +54,11 @@ def get_image_url(title: str) -> str:
             return page["original"]["source"]
     return ""
 
-def create_file(result_wiki: dict):
+def create_file(result_wiki: dict) -> None:
     title = result_wiki.get("title", "result")
     extract = result_wiki.get("extract", "")
     if not extract:
-        print("Aucun contenu à enregistrer.")
+        print("No content save.")
         return
     clean_text = dewiki.from_string(extract)
     filename = re.sub(r'[\\/*?:"<>|]', "_", title) + ".wiki"
@@ -71,7 +70,7 @@ def create_file(result_wiki: dict):
             file.write(f"[Image] : {image_url}\n\n")
         file.write(f"{clean_text}\n\n")
         file.write(f"Source : {wiki_url}\n")
-    print(f"Fichier créé : {filename}")
+    print(f"File created : {filename}")
 
 
 if __name__ == "__main__":
