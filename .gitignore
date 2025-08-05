@@ -54,3 +54,5 @@ secret_key.txt
 */env/
 django_venv/
 */django_venv/
+.django_venv/
+*/.django_venv/

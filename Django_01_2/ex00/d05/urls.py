@@ -16,8 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import TemplateView
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("""
+    <html>
+    <head><title>Welcome to Django</title></head>
+    <body>
+        <h1>The install worked successfully! Congratulations!</h1>
+        <p>You are seeing this message because this Django project is running in DEBUG mode.</p>
+        <p>Try accessing: <a href="/ex00/">ex00</a> or <a href="/admin/">admin</a></p>
+    </body>
+    </html>
+    """)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ex00/', include('ex00.urls')),
+    path('', home, name='home'),
 ]
