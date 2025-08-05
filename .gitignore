@@ -1,3 +1,56 @@
 .DS_Store
 *.DS_Store
 .idea
+
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# Static files
+/static/
+/staticfiles/
+/media/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Django migrations (optionnel - commentez si vous voulez les inclure)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Secret key
+secret_key.txt
+
+# Ignore virtual environments
+*/venv/
+*/.venv/
+*/ENV/
+*/env/
+django_venv/
+*/django_venv/
