@@ -28,6 +28,7 @@ def home(request):
         <p>Try accessing:
             <a href="/ex00/">ex00</a> |
             <a href="/ex01/django">ex01</a> |
+            <a href="/ex02/">ex02</a> |
             <a href="/admin/">admin</a>
         </p>
     </body>
@@ -38,5 +39,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ex00/', include('ex00.urls')),
     path('ex01/', include('ex01.urls')),
+    path('ex02/', include('ex02.urls')),
     path('', home, name='home'),
 ]
