@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Ex01: Template engine.</title>
+{% endblock title %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style2.css' %}">
+{% endblock style %}
+
+{% block content %}
+<h1>Ex01: Template engine</h1>
+<p>
+    Django's default template engine is a powerful system for generating dynamic HTML pages. It allows you to separate the presentation (HTML) from the logic (Python code), making your code cleaner and easier to maintain.
+</p>
+
+<h2>How the template engine works</h2>
+<p>
+    When a view calls <code>render()</code>, Django loads the specified template, processes its tags and variables, and returns the final HTML to the browser. Templates can include logic such as blocks, loops, and conditions.
+</p>
+
+<h3>Blocks (<code>{&#37; block &#37;}</code>)</h3>
+<p>
+    Blocks are used in template inheritance. The <code>base.html</code> template defines blocks (e.g., <code>{&#37; block content &#37;}</code>), and child templates can override these blocks to insert their own content.
+</p>
+<pre>
+<code>
+{&#37; block content &#37;}
+    &lt;h1&gt;Hello!&lt;/h1&gt;
+{&#37; endblock &#37;}
+</code>
+</pre>
+
+<h3>For loops (<code>{&#37; for ... in ... &#37;}</code>)</h3>
+<p>
+    The <code>for</code> tag lets you iterate over a list or queryset passed from the view.
+</p>
+<pre>
+<code>
+{&#37; for item in items &#37;}
+    &lt;p&gt;{{ item }}&lt;/p&gt;
+{&#37; endfor &#37;}
+</code>
+</pre>
+
+<h3>If statements (<code>{&#37; if ... &#37;}</code>)</h3>
+<p>
+    The <code>if</code> tag allows you to add conditional logic in your templates.
+</p>
+<pre>
+<code>
+{&#37; if user.is_authenticated &#37;}
+    &lt;p&gt;Welcome, {{ user.username }}!&lt;/p&gt;
+{&#37; else &#37;}
+    &lt;p&gt;Hello, guest!&lt;/p&gt;
+{&#37; endif &#37;}
+</code>
+</pre>
+
+<h3>Displaying context variables</h3>
+<p>
+    Variables passed from the view to the template can be displayed using double curly braces <code>{{ variable }}</code>.
+</p>
+<pre>
+<code>
+{{ variable }}
+</code>
+</pre>
+
+<p>
+    These features make Django templates flexible and powerful for building dynamic web pages.
+</p>
+{% endblock content %}

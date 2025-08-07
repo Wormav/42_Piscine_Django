@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Fifty Shades of Colors</title>
+	<style>
+		body {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+		}
+		table {
+			border-collapse: collapse;
+			margin: 20px auto;
+		}
+		th, td {
+			width: 77px;
+			height: 37px;
+			border: 1px solid #000;
+			text-align: center;
+			vertical-align: middle;
+		}
+		th {
+			background-color: #f0f0f0;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<h1>Fifty Shades of Colors</h1>
+	<table>
+		<!-- Header row -->
+		<tr>
+			<th>Black</th>
+			<th>Red</th>
+			<th>Blue</th>
+			<th>Green</th>
+		</tr>
+
+		<!-- Color rows -->
+		{% for color_set in colors %}
+		<tr>
+			<td style="background-color: {{ color_set.black }};"></td>
+			<td style="background-color: {{ color_set.red }};"></td>
+			<td style="background-color: {{ color_set.blue }};"></td>
+			<td style="background-color: {{ color_set.green }};"></td>
+		</tr>
+		{% endfor %}
+	</table>
+</body>
+</html>
