@@ -1,5 +1,5 @@
 """
-URL configuration for d05 project.
+URL configuration for d06 project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -27,11 +27,7 @@ def home(request):
     <body>
         <h1>The install worked successfully! Congratulations!</h1>
         <p>Try accessing:
-            <a href="/ex00/">ex00</a> |
-            <a href="/ex01/django">ex01</a> |
-            <a href="/ex02/">ex02</a> |
-            <a href="/ex03/">ex03</a> |
-            <a href="/admin/">admin</a>
+            <a href="/ex00/init">ex00</a> |
         </p>
     </body>
     </html>
@@ -39,10 +35,7 @@ def home(request):
 
 
 urlpatterns = [
+    path("", home, name="home"),
     path("admin/", admin.site.urls),
     path("ex00/", include("ex00.urls")),
-    path("ex01/", include("ex01.urls")),
-    path("ex02/", include("ex02.urls")),
-    path("ex03/", include("ex03.urls")),
-    path("", home, name="home"),
 ]
