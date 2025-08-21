@@ -1,0 +1,4 @@
+name,climate,diameter,orbital_period,population,rotation_period,surface_water,terrain
+Bespin,windy,118000,5110,6000000,12,8,gas giant
+Kamino,moderately windy,19720,463,1000000000,27,100,ocean
+Tatooine,arid,10465,304,200000,23,1,desert
