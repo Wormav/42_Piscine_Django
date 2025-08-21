@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Life Pro Tips</title>
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <span class="navbar-text" id="username-nav">
+            Hello {{ username }}!
+        </span>
+    </nav>
+    <div class="container mt-4">
+        <h1>Welcome to Life Pro Tips !</h1>
+        <p>Share your best tips here!</p>
+    </div>
+    <script>
+        function updateUsername() {
+            fetch('/get_username/')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('username-nav').textContent = 'Hello ' + data.username + '!';
+                });
+        }
+        setInterval(updateUsername, 42001);
+        updateUsername();
+    </script>
+</body>
+</html>
