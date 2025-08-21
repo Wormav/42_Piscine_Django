@@ -7,7 +7,7 @@ from . import views
 def home(request):
     return HttpResponse("""
     <html>
-    <head><title>Ex02</title></head>
+    <head><title>Ex04</title></head>
     <body>
         <p>Try accessing:
             <a href="/ex04/init">init</a> |

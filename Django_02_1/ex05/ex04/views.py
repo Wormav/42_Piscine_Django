@@ -77,7 +77,7 @@ def populate(request):
                     "SELECT 1 FROM ex04_movies WHERE episode_nb = %s;", (m[0],)
                 )
                 if cursor.fetchone():
-                    results.append(f"{m[1]}already present")
+                    results.append(f"{m[1]} already present")
                     continue
                 cursor.execute(
                     """

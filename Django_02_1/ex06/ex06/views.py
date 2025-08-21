@@ -1,10 +1,10 @@
-# Create your views here.
 import psycopg2
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 
+# Create your views here.
 def init(request):
     try:
         conn = psycopg2.connect(
@@ -16,14 +16,35 @@ def init(request):
         )
         cursor = conn.cursor()
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS ex04_movies (
+            CREATE TABLE IF NOT EXISTS ex06_movies (
                 episode_nb INTEGER PRIMARY KEY,
                 title VARCHAR(64) UNIQUE NOT NULL,
                 opening_crawl TEXT,
                 director VARCHAR(32) NOT NULL,
                 producer VARCHAR(128) NOT NULL,
-                release_date DATE NOT NULL
+                release_date DATE NOT NULL,
+                created TIMESTAMP DEFAULT now(),
+                updated TIMESTAMP DEFAULT now()
             );
+        """)
+        # Fonction et trigger pour updated
+        cursor.execute("""
+            CREATE OR REPLACE FUNCTION update_changetimestamp_column()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.updated = now();
+                NEW.created = OLD.created;
+                RETURN NEW;
+            END;
+            $$ language 'plpgsql';
+        """)
+        cursor.execute("""
+            DROP TRIGGER IF EXISTS update_films_changetimestamp ON ex06_movies;
+        """)
+        cursor.execute("""
+            CREATE TRIGGER update_films_changetimestamp
+            BEFORE UPDATE ON ex06_movies
+            FOR EACH ROW EXECUTE PROCEDURE update_changetimestamp_column();
         """)
         conn.commit()
         cursor.close()
@@ -74,14 +95,14 @@ def populate(request):
         for m in movies_data:
             try:
                 cursor.execute(
-                    "SELECT 1 FROM ex04_movies WHERE episode_nb = %s;", (m[0],)
+                    "SELECT 1 FROM ex06_movies WHERE episode_nb = %s;", (m[0],)
                 )
                 if cursor.fetchone():
                     results.append(f"{m[1]} already present")
                     continue
                 cursor.execute(
                     """
-                    INSERT INTO ex04_movies (episode_nb, title, director, producer, release_date)
+                    INSERT INTO ex06_movies (episode_nb, title, director, producer, release_date)
                     VALUES (%s, %s, %s, %s, %s)
                 """,
                     m,
@@ -89,7 +110,7 @@ def populate(request):
                 conn.commit()
                 results.append("OK")
             except Exception as e:
-                results.append(f"Error for {m[1]} : {str(e)}")
+                results.append(f"Erreur pour {m[1]} : {str(e)}")
         cursor.close()
         conn.close()
         return HttpResponse("<br>".join(results))
@@ -107,7 +128,7 @@ def display(request):
             port=settings.DATABASES["default"]["PORT"],
         )
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM ex04_movies ORDER BY episode_nb;")
+        cursor.execute("SELECT * FROM ex06_movies ORDER BY episode_nb;")
         movies = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -122,6 +143,8 @@ def display(request):
                 <th>Director</th>
                 <th>Producer</th>
                 <th>Release Date</th>
+                <th>Created</th>
+                <th>Updated</th>
             </tr>
         """
         for m in movies:
@@ -133,6 +156,8 @@ def display(request):
                 <td>{m[3]}</td>
                 <td>{m[4]}</td>
                 <td>{m[5]}</td>
+                <td>{m[6]}</td>
+                <td>{m[7]}</td>
             </tr>
             """
         html += "</table>"
@@ -142,7 +167,7 @@ def display(request):
 
 
 @csrf_exempt
-def remove(request):
+def update(request):
     try:
         conn = psycopg2.connect(
             dbname=settings.DATABASES["default"]["NAME"],
@@ -154,9 +179,13 @@ def remove(request):
         cursor = conn.cursor()
         if request.method == "POST":
             title = request.POST.get("title")
-            cursor.execute("DELETE FROM ex04_movies WHERE title = %s;", (title,))
+            crawl = request.POST.get("crawl")
+            cursor.execute(
+                "UPDATE ex06_movies SET opening_crawl = %s WHERE title = %s;",
+                (crawl, title),
+            )
             conn.commit()
-        cursor.execute("SELECT title FROM ex04_movies ORDER BY episode_nb;")
+        cursor.execute("SELECT title FROM ex06_movies ORDER BY episode_nb;")
         titles = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -170,7 +199,8 @@ def remove(request):
             html += f'<option value="{t[0]}">{t[0]}</option>'
         html += """
             </select>
-            <button type="submit" name="remove">remove</button>
+            <input type="text" name="crawl" placeholder="Nouveau texte" required>
+            <button type="submit">update</button>
         </form>
         """
         return HttpResponse(html)
