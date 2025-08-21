@@ -113,7 +113,7 @@ def main():
         f.write(html)
     with open(CSS_FILE, "w") as f:
         f.write(css)
-    print(f"Fichiers générés : {HTML_FILE}, {CSS_FILE}")
+    print(f"Files génered : {HTML_FILE}, {CSS_FILE}")
 
 if __name__ == "__main__":
     main()
