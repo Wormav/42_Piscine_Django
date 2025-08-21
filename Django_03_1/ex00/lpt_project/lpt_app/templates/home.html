@@ -8,9 +8,16 @@
 </head>
 <body>
     <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="/">Life Pro Tips</a>
         <span class="navbar-text" id="username-nav">
             Hello {{ username }}!
         </span>
+        {% if not user.is_authenticated %}
+            <a class="nav-link d-inline" href="{% url 'signup' %}">Sign up</a>
+            <a class="nav-link d-inline" href="{% url 'login' %}">Login</a>
+        {% else %}
+            <a class="nav-link d-inline" href="{% url 'logout' %}">Logout</a>
+        {% endif %}
     </nav>
     <div class="container mt-4">
         <h1>Welcome to Life Pro Tips !</h1>
@@ -21,10 +28,14 @@
             fetch('/get_username/')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('username-nav').textContent = 'Hello ' + data.username + '!';
+                    {% if not user.is_authenticated %}
+                        document.getElementById('username-nav').textContent = 'Hello ' + data.username + '!';
+                    {% else %}
+                        document.getElementById('username-nav').textContent = 'Hello {{ user.username }}!';
+                    {% endif %}
                 });
         }
-        setInterval(updateUsername, 42001);
+        setInterval(updateUsername, 1000);
         updateUsername();
     </script>
 </body>

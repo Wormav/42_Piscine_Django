@@ -44,24 +44,17 @@ def init(request):
         conn.commit()
         cursor.close()
         conn.close()
-        base_dir = settings.BASE_DIR
-        planets_path = os.path.join(base_dir, "ex08", "planets.csv")
-        people_path = os.path.join(base_dir, "ex08", "people.csv")
-
-        if not os.path.exists(planets_path):
-            with open(planets_path, "w") as f:
-                f.write(
-                    "name,climate,diameter,orbital_period,population,rotation_period,surface_water,terrain\n"
-                )
-        if not os.path.exists(people_path):
-            with open(people_path, "w") as f:
-                f.write(
-                    "name,birth_year,gender,eye_color,hair_color,height,mass,homeworld\n"
-                )
-
         return HttpResponse("OK")
     except Exception as e:
         return HttpResponse(f"Erreur : {str(e)}")
+
+
+def clean_csv(filepath):
+    temp_path = filepath + ".tmp"
+    with open(filepath, "r") as fin, open(temp_path, "w") as fout:
+        for line in fin:
+            fout.write(line.replace("NULL", "\\N").replace("\t\t", "\t\\N\t"))
+    return temp_path
 
 
 def populate(request):
@@ -70,25 +63,8 @@ def populate(request):
     planets_csv = os.path.join(base_dir, "ex08", "planets.csv")
     people_csv = os.path.join(base_dir, "ex08", "people.csv")
 
-    fake_planets = [
-        "Bespin,windy,118000,5110,6000000,12,8,gas giant\n",
-        "Kamino,moderately windy,19720,463,1000000000,27,100,ocean\n",
-        "Tatooine,arid,10465,304,200000,23,1,desert\n",
-    ]
-    with open(planets_csv, "w") as f:
-        f.write(
-            "name,climate,diameter,orbital_period,population,rotation_period,surface_water,terrain\n"
-        )
-        f.writelines(fake_planets)
-
-    fake_people = [
-        "Lobot,37BBY,male,blue,none,175,79,Bespin\n",
-        "Taun We,unknown,female,black,none,213,0,Kamino\n",
-        "Luke Skywalker,19BBY,male,blue,blond,172,77,Tatooine\n",
-    ]
-    with open(people_csv, "w") as f:
-        f.write("name,birth_year,gender,eye_color,hair_color,height,mass,homeworld\n")
-        f.writelines(fake_people)
+    planets_clean = None
+    people_clean = None
 
     try:
         conn = psycopg2.connect(
@@ -100,60 +76,73 @@ def populate(request):
         )
         cursor = conn.cursor()
 
-        # Vider les tables avant insertion
         cursor.execute("TRUNCATE TABLE ex08_people CASCADE;")
         cursor.execute("TRUNCATE TABLE ex08_planets CASCADE;")
         conn.commit()
 
-        try:
-            with open(planets_csv, "r") as f:
-                next(f)  # skip header
-                cursor.copy_from(
-                    f,
-                    "ex08_planets",
-                    sep=",",
-                    columns=(
-                        "name",
-                        "climate",
-                        "diameter",
-                        "orbital_period",
-                        "population",
-                        "rotation_period",
-                        "surface_water",
-                        "terrain",
-                    ),
-                )
-            conn.commit()
-            results.append("OK planets")
-        except Exception as e:
-            results.append(f"Erreur planets : {str(e)}")
+        planets_clean = clean_csv(planets_csv)
+        people_clean = clean_csv(people_csv)
 
-        try:
-            with open(people_csv, "r") as f:
-                next(f)  # skip header
-                cursor.copy_from(
-                    f,
-                    "ex08_people",
-                    sep=",",
-                    columns=(
-                        "name",
-                        "birth_year",
-                        "gender",
-                        "eye_color",
-                        "hair_color",
-                        "height",
-                        "mass",
-                        "homeworld",
-                    ),
-                )
-            conn.commit()
-            results.append("OK people")
-        except Exception as e:
-            results.append(f"Erreur people : {str(e)}")
+        with open(planets_clean, "r") as f:
+            lines = f.readlines()
+            print("Contenu du fichier planets_clean :")
+            for i, line in enumerate(lines[:5]):
+                print(f"Ligne {i}: {repr(line)}")
+
+        with open(planets_clean, "r") as f:
+            cursor.copy_from(
+                f,
+                "ex08_planets",
+                sep="\t",
+                columns=(
+                    "name",
+                    "climate",
+                    "diameter",
+                    "orbital_period",
+                    "population",
+                    "rotation_period",
+                    "surface_water",
+                    "terrain",
+                ),
+            )
+        conn.commit()
+        results.append("OK planets")
+
+        cursor.execute("SELECT name FROM ex08_planets;")
+        planet_names = cursor.fetchall()
+        print("Planets insérées :", planet_names)
+
+        with open(people_clean, "r") as f:
+            cursor.copy_from(
+                f,
+                "ex08_people",
+                sep="\t",
+                columns=(
+                    "name",
+                    "birth_year",
+                    "gender",
+                    "eye_color",
+                    "hair_color",
+                    "height",
+                    "mass",
+                    "homeworld",
+                ),
+            )
+        conn.commit()
+        results.append("OK people")
         cursor.close()
         conn.close()
+        os.remove(planets_clean)
+        os.remove(people_clean)
         return HttpResponse("<br>".join(results))
     except Exception as e:
+        try:
+            if planets_clean and os.path.exists(planets_clean):
+                os.remove(planets_clean)
+            if people_clean and os.path.exists(people_clean):
+                os.remove(people_clean)
+        except Exception:
+            pass
         return HttpResponse(f"Erreur : {str(e)}")
 
 
@@ -171,7 +160,7 @@ def display(request):
             SELECT p.name, p.homeworld, pl.climate
             FROM ex08_people p
             JOIN ex08_planets pl ON p.homeworld = pl.name
-            WHERE pl.climate IN ('windy', 'moderately windy')
+            WHERE pl.climate LIKE '%temperate%'
             ORDER BY p.name ASC;
         """)
         rows = cursor.fetchall()

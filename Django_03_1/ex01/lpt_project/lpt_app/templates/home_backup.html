@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html     <div class="container mt-5">
+        <div class="jumbotron bg-gradient text-center shadow-lg">
+            <h1 class="display-4 text-primary">🚀 Welcome to Life Pro Tips!</h1>
+            <p class="lead">Share your best life hacks and discover amazing tips from the community.</p>
+            {% if not user.is_authenticated %}
+                <hr class="my-4">
+                <p>Join our community to start sharing your own tips!</p>
+                <a class="btn btn-primary btn-lg mr-2" href="{% url 'signup' %}" role="button">Get Started</a>
+                <a class="btn btn-outline-primary btn-lg" href="{% url 'login' %}" role="button">Sign In</a>
+            {% else %}
+                <hr class="my-4">
+                <p>Ready to share some wisdom? Start posting your tips!</p>
+                <button class="btn btn-success btn-lg" disabled>Coming Soon: Post a Tip</button>
+            {% endif %}
+        </div>
+    </div>
+    <style>
+        .bg-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .jumbotron {
+            border-radius: 15px;
+            border: none;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>   <meta charset="UTF-8">
+    <title>Life Pro Tips</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand font-weight-bold" href="/">💡 Life Pro Tips</a>
+        <div class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+                <span class="navbar-text text-light mr-3">
+                    Welcome, {{ user.username }}!
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a class="btn btn-outline-light btn-sm mr-2" href="{% url 'signup' %}">Sign up</a>
+                <a class="btn btn-light btn-sm" href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1>Welcome to Life Pro Tips !</h1>
+        <p>Share your best tips here!</p>
+    </div>
+    <script>
+        function updateUsername() {
+            {% if not user.is_authenticated %}
+                fetch('/get_username/')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('username-nav').textContent = 'Hello ' + data.username + '!';
+                    });
+            {% endif %}
+        }
+        {% if not user.is_authenticated %}
+            setInterval(updateUsername, 1000);
+            updateUsername();
+        {% endif %}
+    </script>
+</body>
+</html>
