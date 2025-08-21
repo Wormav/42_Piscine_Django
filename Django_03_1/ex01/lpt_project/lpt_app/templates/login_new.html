@@ -24,15 +24,15 @@
                             <label for="{{ form.username.id_for_label }}" class="font-weight-bold">
                                 <i class="fas fa-user mr-1"></i>Username:
                             </label>
-                            <input type="text" class="form-control" name="username" id="{{ form.username.id_for_label }}" 
-                                   value="{{ form.username.value|default:'' }}" required 
+                            <input type="text" class="form-control" name="username" id="{{ form.username.id_for_label }}"
+                                   value="{{ form.username.value|default:'' }}" required
                                    placeholder="Enter your username">
                         </div>
                         <div class="form-group">
                             <label for="{{ form.password.id_for_label }}" class="font-weight-bold">
                                 <i class="fas fa-lock mr-1"></i>Password:
                             </label>
-                            <input type="password" class="form-control" name="password" id="{{ form.password.id_for_label }}" 
+                            <input type="password" class="form-control" name="password" id="{{ form.password.id_for_label }}"
                                    required placeholder="Enter your password">
                         </div>
                         <button type="submit" class="btn btn-primary btn-block btn-lg">
@@ -40,7 +40,7 @@
                         </button>
                     </form>
                     <div class="text-center mt-3">
-                        <p>Don't have an account? 
+                        <p>Don't have an account?
                             <a href="{% url 'signup' %}" class="text-primary">
                                 <i class="fas fa-user-plus mr-1"></i>Create one here
                             </a>
