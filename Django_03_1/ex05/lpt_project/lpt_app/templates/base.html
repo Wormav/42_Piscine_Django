@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Life Pro Tips{% endblock %}</title>
+    {% load static %}
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background-color: #2d2d2d;
+            border: 1px solid #404040;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%) !important;
+            border-bottom: 1px solid #404040;
+        }
+        .form-control {
+            background-color: #404040;
+            border: 1px solid #555;
+            color: #ffffff;
+        }
+        .form-control:focus {
+            background-color: #4a4a4a;
+            border-color: #74b9ff;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(116, 185, 255, 0.25);
+        }
+        .form-control::placeholder {
+            color: #aaa;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            border: none;
+        }
+        .btn-outline-primary {
+            border-color: #74b9ff;
+            color: #74b9ff;
+        }
+        .btn-outline-primary:hover {
+            background-color: #74b9ff;
+        }
+        .text-primary {
+            color: #74b9ff !important;
+        }
+        .bg-gradient {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+        }
+        .jumbotron {
+            border-radius: 15px;
+            border: none;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+        /* Style amélioré pour le bouton logout */
+        .btn-logout {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+        }
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+            color: white;
+        }
+        .btn-logout:focus {
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.5);
+            color: white;
+        }
+        .btn-logout:active {
+            transform: translateY(0);
+        }
+        /* Styles pour les badges utilisateur */
+        .badge {
+            font-size: 0.7rem;
+            border-radius: 12px;
+            padding: 4px 8px;
+        }
+        .badge-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        .badge-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
+        .badge-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand font-weight-bold" href="/">💡 Life Pro Tips</a>
+        <div class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+                <span class="navbar-text text-light mr-3">
+                    Welcome, <strong>{{ user.username }}</strong>!
+                    {% if user.is_superuser %}
+                        <span class="badge badge-danger ml-2">👑 Admin</span>
+                    {% elif user_has_downvote_perm %}
+                        <span class="badge badge-warning ml-2">🔑 Moderator</span>
+                    {% else %}
+                        <span class="badge badge-secondary ml-2">👤 User</span>
+                    {% endif %}
+                </span>
+                <a class="btn btn-logout btn-sm mr-2" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                </a>
+                {% if user.is_staff %}
+                <a class="btn btn-outline-light btn-sm" href="/admin/" target="_blank">
+                    <i class="fas fa-cog mr-1"></i>Admin
+                </a>
+                {% endif %}
+            {% else %}
+                <a class="btn btn-outline-light btn-sm mr-2" href="{% url 'signup' %}">
+                    <i class="fas fa-user-plus mr-1"></i>Sign up
+                </a>
+                <a class="btn btn-light btn-sm" href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt mr-1"></i>Login
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% bootstrap_javascript jquery='full' %}
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
