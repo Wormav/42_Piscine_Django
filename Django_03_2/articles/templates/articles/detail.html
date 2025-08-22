@@ -1,4 +1,5 @@
 {% extends 'articles/base.html' %}
+{% load i18n %}
 
 {% block title %}{{ article.title }}{% endblock %}
 
@@ -9,19 +10,19 @@
             <div class="card-header">
                 <h1 class="mb-1">{{ article.title }}</h1>
                 <div class="text-muted">
-                    By <strong>{{ article.author.username }}</strong>
+                    {% trans "By" %} <strong>{{ article.author.username }}</strong>
                     • <time>{{ article.created|date:"F d, Y \a\t H:i" }}</time>
                 </div>
             </div>
-            
+
             <div class="card-body">
                 <div class="alert alert-info">
-                    <h5>Synopsis</h5>
+                    <h5>{% trans "Synopsis" %}</h5>
                     <p class="mb-0">{{ article.synopsis }}</p>
                 </div>
 
                 <div class="mt-4">
-                    <h5>Article Content</h5>
+                    <h5>{% trans "Article Content" %}</h5>
                     <div class="text-dark lh-lg">
                         {{ article.content|linebreaks }}
                     </div>
@@ -32,30 +33,30 @@
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
                     {% if user.is_authenticated %}
                         <!-- CreateView Add to Favourite button (ex02 requirement) -->
-                        <a href="{% url 'articles:add_favourite' article.pk %}" class="btn btn-outline-warning">
-                            ⭐ Add to Favourites
+                        <a href="/{{ LANGUAGE_CODE }}/articles/{{ article.pk }}/add-favourite/" class="btn btn-outline-warning">
+                            ⭐ {% trans "Add to Favourites" %}
                         </a>
 
                         <!-- Toggle Favourite button (existing functionality) -->
-                        <form method="post" action="{% url 'articles:toggle_favourite' article.pk %}" class="d-inline">
+                        <form method="post" action="/{{ LANGUAGE_CODE }}/articles/{{ article.pk }}/toggle-favourite/" class="d-inline">
                             {% csrf_token %}
                             <button type="submit" class="btn {% if is_favourite %}btn-secondary{% else %}btn-warning{% endif %}">
                                 {% if is_favourite %}
-                                    💔 Remove from Favourites
+                                    💔 {% trans "Remove from Favourites" %}
                                 {% else %}
-                                    💖 Toggle Favourite
+                                    💖 {% trans "Toggle Favourite" %}
                                 {% endif %}
                             </button>
                         </form>
                     {% endif %}
 
-                    <a href="{% url 'articles:list' %}" class="btn btn-secondary">
-                        ← Back to Articles
+                    <a href="/{{ LANGUAGE_CODE }}/articles/" class="btn btn-secondary">
+                        ← {% trans "Back to Articles" %}
                     </a>
 
                     {% if user.is_authenticated and user == article.author %}
-                        <a href="{% url 'articles:publications' %}" class="btn btn-primary">
-                            My Publications
+                        <a href="/{{ LANGUAGE_CODE }}/publications/" class="btn btn-primary">
+                            {% trans "My Publications" %}
                         </a>
                     {% endif %}
                 </div>

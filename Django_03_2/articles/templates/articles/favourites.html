@@ -1,11 +1,12 @@
 {% extends 'articles/base.html' %}
+{% load i18n %}
 
-{% block title %}Favourites{% endblock %}
+{% block title %}{% trans "Favourites" %}{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2 class="mb-4">My Favourite Articles</h2>
+        <h2 class="mb-4">{% trans "My Favourite Articles" %}</h2>
 
         {% if favourites %}
             <div class="row">
@@ -14,12 +15,12 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="{% url 'articles:detail' favourite.article.pk %}" class="text-decoration-none">
+                                    <a href="/{{ LANGUAGE_CODE }}/articles/{{ favourite.article.pk }}/" class="text-decoration-none">
                                         {{ favourite.article.title }}
                                     </a>
                                 </h5>
                                 <h6 class="card-subtitle mb-2 text-muted">
-                                    By {{ favourite.article.author.username }}
+                                    {% trans "By" %} {{ favourite.article.author.username }}
                                 </h6>
                                 <p class="card-text">
                                     {{ favourite.article.synopsis|truncatechars:100 }}
@@ -29,8 +30,8 @@
                                 </p>
                             </div>
                             <div class="card-footer">
-                                <a href="{% url 'articles:detail' favourite.article.pk %}" class="btn btn-read btn-sm">
-                                    Read Article
+                                <a href="/{{ LANGUAGE_CODE }}/articles/{{ favourite.article.pk }}/" class="btn btn-read btn-sm">
+                                    {% trans "Read Article" %}
                                 </a>
                             </div>
                         </div>
@@ -39,13 +40,13 @@
             </div>
 
             <div class="text-center mt-3 text-muted">
-                <p><strong>{{ favourites|length }}</strong> favourite article{{ favourites|length|pluralize }}</p>
+                <p><strong>{{ favourites|length }}</strong> {% trans "favourite article" %}{{ favourites|length|pluralize }}</p>
             </div>
         {% else %}
             <div class="text-center py-5">
-                <h3>No Favourites Yet</h3>
-                <p class="text-muted">Add some articles to your favourites to see them here!</p>
-                <a href="{% url 'articles:list' %}" class="btn btn-primary">Browse Articles</a>
+                <h3>{% trans "No Favourites Yet" %}</h3>
+                <p class="text-muted">{% trans "Add some articles to your favourites to see them here!" %}</p>
+                <a href="/{{ LANGUAGE_CODE }}/articles/" class="btn btn-primary">{% trans "Browse Articles" %}</a>
             </div>
         {% endif %}
     </div>

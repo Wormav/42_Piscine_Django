@@ -1,9 +1,11 @@
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Articles{% endblock %}</title>
+    <title>{% block title %}{% trans "Articles" %}{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -79,14 +81,46 @@
             display: inline;
             margin-left: 1rem;
         }
+
+        .language-switcher {
+            float: right;
+            font-size: 1rem;
+        }
+
+        .language-switcher a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: inherit;
+        }
+
+        .language-switcher a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <!-- Main Header -->
     <header class="main-header">
         <div class="container">
-            <h1>Articles</h1>
-            <p>Share your writings</p>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1>{% trans "Articles" %}</h1>
+                    <p>{% trans "Share your writings" %}</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="language-switcher">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% if LANGUAGE_CODE == 'en' %}
+                            {% get_language_info for 'fr' as lang %}
+                            <a href="/fr{{ request.get_full_path|slice:'3:' }}">passer en français</a>
+                        {% else %}
+                            {% get_language_info for 'en' as lang %}
+                            <a href="/en{{ request.get_full_path|slice:'3:' }}">Switch to English</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -100,19 +134,19 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'articles:home' %}">
-                            <i class="fas fa-home"></i> Home
+                        <a class="nav-link" href="/{{ LANGUAGE_CODE }}/">
+                            <i class="fas fa-home"></i> {% trans "Home" %}
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'articles:list' %}">Last Articles</a>
+                        <a class="nav-link" href="/{{ LANGUAGE_CODE }}/articles/">{% trans "Last Articles" %}</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'articles:favourites' %}">Favourites</a>
+                            <a class="nav-link" href="/{{ LANGUAGE_CODE }}/favourites/">{% trans "Favourites" %}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'articles:publications' %}">Publications</a>
+                            <a class="nav-link" href="/{{ LANGUAGE_CODE }}/publications/">{% trans "Publications" %}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -120,17 +154,17 @@
                 <div class="d-flex align-items-center">
                     {% if user.is_authenticated %}
                         <span class="navbar-text me-3">
-                            Logged as {{ user.username }}
+                            {% trans "Logged as" %} {{ user.username }}
                         </span>
-                        <a href="{% url 'articles:logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+                        <a href="/{{ LANGUAGE_CODE }}/logout/" class="btn btn-outline-danger btn-sm">{% trans "Logout" %}</a>
                     {% else %}
-                        <a href="{% url 'articles:register' %}" class="btn btn-outline-success btn-sm me-2">Register</a>
+                        <a href="/{{ LANGUAGE_CODE }}/register/" class="btn btn-outline-success btn-sm me-2">{% trans "Register" %}</a>
                         <!-- Login form integrated in navbar -->
-                        <form method="post" action="{% url 'articles:login' %}" class="d-flex align-items-center">
+                        <form method="post" action="/{{ LANGUAGE_CODE }}/login/" class="d-flex align-items-center">
                             {% csrf_token %}
-                            <input type="text" name="username" class="form-control form-control-sm me-1" placeholder="username" required style="width: 120px;">
-                            <input type="password" name="password" class="form-control form-control-sm me-1" placeholder="password" required style="width: 120px;">
-                            <button type="submit" class="btn btn-login btn-sm">Login</button>
+                            <input type="text" name="username" class="form-control form-control-sm me-1" placeholder="{% trans 'username' %}" required style="width: 120px;">
+                            <input type="password" name="password" class="form-control form-control-sm me-1" placeholder="{% trans 'password' %}" required style="width: 120px;">
+                            <button type="submit" class="btn btn-login btn-sm">{% trans "Login" %}</button>
                         </form>
                     {% endif %}
                 </div>

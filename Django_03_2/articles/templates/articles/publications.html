@@ -1,14 +1,15 @@
 {% extends 'articles/base.html' %}
+{% load i18n %}
 
-{% block title %}Publications{% endblock %}
+{% block title %}{% trans "Publications" %}{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>My Publications</h2>
-            <a href="{% url 'articles:publish' %}" class="btn btn-success">
-                Publish New Article
+            <h2>{% trans "My Publications" %}</h2>
+            <a href="/{{ LANGUAGE_CODE }}/publish/" class="btn btn-success">
+                {% trans "Publish New Article" %}
             </a>
         </div>
 
@@ -17,11 +18,11 @@
                 <table class="table table-striped table-hover">
                     <thead class="table-dark">
                         <tr>
-                            <th scope="col">Title</th>
-                            <th scope="col">Synopsis</th>
-                            <th scope="col">Created</th>
-                            <th scope="col">When</th>
-                            <th scope="col">Actions</th>
+                            <th scope="col">{% trans "Title" %}</th>
+                            <th scope="col">{% trans "Synopsis" %}</th>
+                            <th scope="col">{% trans "Created" %}</th>
+                            <th scope="col">{% trans "When" %}</th>
+                            <th scope="col">{% trans "Actions" %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -30,14 +31,14 @@
                                 <td>{{ article.title }}</td>
                                 <td>{{ article.synopsis|truncatechars:20 }}</td>
                                 <td>{{ article.created|date:"M. d, Y, g:i a" }}</td>
-                                <td>{{ article.created|timesince }} ago</td>
+                                <td>{{ article.created|timesince }} {% trans "ago" %}</td>
                                 <td>
-                                    <a href="{% url 'articles:detail' article.pk %}" class="btn btn-read btn-sm me-1">
-                                        View
+                                    <a href="/{{ LANGUAGE_CODE }}/articles/{{ article.pk }}/" class="btn btn-read btn-sm me-1">
+                                        {% trans "View" %}
                                     </a>
-                                    <a href="{% url 'articles:delete' article.pk %}" class="btn btn-danger btn-sm"
-                                       onclick="return confirm('Are you sure you want to delete this article?')">
-                                        Delete
+                                    <a href="/{{ LANGUAGE_CODE }}/articles/{{ article.pk }}/delete/" class="btn btn-danger btn-sm"
+                                       onclick="return confirm('{% trans "Are you sure you want to delete this article?" %}')">
+                                        {% trans "Delete" %}
                                     </a>
                                 </td>
                             </tr>
@@ -47,12 +48,12 @@
             </div>
 
             <div class="text-center mt-3 text-muted">
-                <p><strong>{{ articles|length }}</strong> article{{ articles|length|pluralize }} published by you</p>
+                <p><strong>{{ articles|length }}</strong> {% trans "article" %}{{ articles|length|pluralize }} {% trans "published by you" %}</p>
             </div>
         {% else %}
             <div class="text-center py-5">
-                <h3>No Publications Yet</h3>
-                <p class="text-muted">You haven't published any articles yet. Start writing to share your knowledge!</p>
+                <h3>{% trans "No Publications Yet" %}</h3>
+                <p class="text-muted">{% trans "You haven't published any articles yet. Start writing to share your knowledge!" %}</p>
             </div>
         {% endif %}
     </div>
