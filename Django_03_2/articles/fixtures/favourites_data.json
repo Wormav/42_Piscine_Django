@@ -1,0 +1,42 @@
+[
+  {
+    "model": "articles.userfavouritearticle",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "article": 1
+    }
+  },
+  {
+    "model": "articles.userfavouritearticle",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "article": 3
+    }
+  },
+  {
+    "model": "articles.userfavouritearticle",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "article": 2
+    }
+  },
+  {
+    "model": "articles.userfavouritearticle",
+    "pk": 4,
+    "fields": {
+      "user": 3,
+      "article": 4
+    }
+  },
+  {
+    "model": "articles.userfavouritearticle",
+    "pk": 5,
+    "fields": {
+      "user": 3,
+      "article": 5
+    }
+  }
+]

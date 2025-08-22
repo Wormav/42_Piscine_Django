@@ -17,6 +17,7 @@
                         <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Author</th>
                         <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Created</th>
                         <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Synopsis</th>
+                        <th style="padding: 1rem; text-align: center; color: #2c3e50; font-weight: bold;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,7 +26,12 @@
                             onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'"
                             onmouseout="this.style.background='transparent'">
                             <td style="padding: 1rem; font-weight: 500; color: #f39c12;">
-                                {{ article.title }}
+                                <a href="{% url 'articles:detail' article.pk %}"
+                                   style="color: #f39c12; text-decoration: none; transition: color 0.3s ease;"
+                                   onmouseover="this.style.color='#e67e22'"
+                                   onmouseout="this.style.color='#f39c12'">
+                                    {{ article.title }}
+                                </a>
                             </td>
                             <td style="padding: 1rem; color: #bdc3c7;">
                                 {{ article.author.username }}
@@ -35,6 +41,14 @@
                             </td>
                             <td style="padding: 1rem; color: #ecf0f1; line-height: 1.4;">
                                 {{ article.synopsis }}
+                            </td>
+                            <td style="padding: 1rem; text-align: center;">
+                                <a href="{% url 'articles:detail' article.pk %}"
+                                   style="background: linear-gradient(45deg, #3498db, #2980b9); color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 5px; font-size: 0.9rem; transition: all 0.3s ease; display: inline-block;"
+                                   onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 2px 8px rgba(52, 152, 219, 0.4)'"
+                                   onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                    <span class="chess-piece">👁️</span> View
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

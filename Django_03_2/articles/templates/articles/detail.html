@@ -1,0 +1,95 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}{{ article.title }} - Chess Articles{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="color: #f39c12; margin-bottom: 0.5rem; font-size: 2.2rem;">
+            <span class="chess-piece">♔</span> {{ article.title }} <span class="chess-piece">♛</span>
+        </h1>
+        <div style="color: #95a5a6; font-size: 1rem; margin-bottom: 1rem;">
+            By <strong style="color: #bdc3c7;">{{ article.author.username }}</strong>
+            • <time>{{ article.created|date:"F d, Y \a\t H:i" }}</time>
+        </div>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 4px solid #f39c12;">
+        <h3 style="color: #f39c12; margin-bottom: 1rem; font-size: 1.3rem;">
+            <span class="chess-piece">♗</span> Synopsis
+        </h3>
+        <p style="color: #ecf0f1; line-height: 1.6; font-size: 1.1rem; font-style: italic;">
+            {{ article.synopsis }}
+        </p>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.03); padding: 2rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <h3 style="color: #f39c12; margin-bottom: 1.5rem; font-size: 1.3rem;">
+            <span class="chess-piece">♕</span> Article Content
+        </h3>
+        <div style="color: #ecf0f1; line-height: 1.8; font-size: 1rem;">
+            {{ article.content|linebreaks }}
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.2); text-align: center;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'articles:toggle_favourite' article.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit"
+                            style="background: linear-gradient(45deg, {% if is_favourite %}#e74c3c, #c0392b{% else %}#e67e22, #d35400{% endif %}); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-size: 1rem;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.3)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                        {% if is_favourite %}
+                            <span class="chess-piece">💔</span> Remove from Favourites
+                        {% else %}
+                            <span class="chess-piece">💖</span> Add to Favourites
+                        {% endif %}
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <a href="{% url 'articles:list' %}"
+               style="background: linear-gradient(45deg, #34495e, #2c3e50); color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; display: inline-block;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.3)'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <span class="chess-piece">♖</span> Back to Articles
+            </a>
+
+            {% if user.is_authenticated and user == article.author %}
+                <a href="{% url 'articles:publications' %}"
+                   style="background: linear-gradient(45deg, #f39c12, #e67e22); color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; display: inline-block;"
+                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(243, 156, 18, 0.4)'"
+                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                    <span class="chess-piece">♘</span> My Publications
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        .card {
+            padding: 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.8rem !important;
+        }
+
+        .chess-piece {
+            display: none;
+        }
+
+        div[style*="margin-right: 1rem"] {
+            margin-right: 0 !important;
+            margin-bottom: 1rem;
+            display: block;
+        }
+    }
+</style>
+{% endblock %}

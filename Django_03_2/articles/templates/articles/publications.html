@@ -1,0 +1,90 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}Chess Articles - My Publications{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #f39c12; margin-bottom: 1.5rem; text-align: center;">
+        <span class="chess-piece">♗</span> My Publications <span class="chess-piece">♙</span>
+    </h2>
+
+    {% if articles %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden;">
+                <thead>
+                    <tr style="background: rgba(243, 156, 18, 0.8);">
+                        <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Title</th>
+                        <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Synopsis</th>
+                        <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Created</th>
+                        <th style="padding: 1rem; text-align: center; color: #2c3e50; font-weight: bold;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in articles %}
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;"
+                            onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'"
+                            onmouseout="this.style.background='transparent'">
+                            <td style="padding: 1rem; font-weight: 500; color: #f39c12;">
+                                {{ article.title }}
+                            </td>
+                            <td style="padding: 1rem; color: #ecf0f1; line-height: 1.4; max-width: 300px;">
+                                {{ article.synopsis|truncatechars:100 }}
+                            </td>
+                            <td style="padding: 1rem; color: #95a5a6;">
+                                {{ article.created|date:"M d, Y H:i" }}
+                            </td>
+                            <td style="padding: 1rem; text-align: center;">
+                                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                                    <a href="{% url 'articles:detail' article.pk %}"
+                                       style="background: linear-gradient(45deg, #3498db, #2980b9); color: white; text-decoration: none; padding: 0.4rem 0.8rem; border-radius: 5px; font-size: 0.8rem; transition: all 0.3s ease; display: inline-block;"
+                                       onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 2px 8px rgba(52, 152, 219, 0.4)'"
+                                       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+                                        <span class="chess-piece">♔</span> View
+                                    </a>
+                                    <a href="{% url 'articles:delete' article.pk %}"
+                                       style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; text-decoration: none; padding: 0.4rem 0.8rem; border-radius: 5px; font-size: 0.8rem; transition: all 0.3s ease; display: inline-block;"
+                                       onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 2px 8px rgba(231, 76, 60, 0.4)'"
+                                       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'"
+                                       onclick="return confirm('Are you sure you want to delete this article?')">
+                                        <span class="chess-piece">♜</span> Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: center; color: #bdc3c7;">
+            <p><strong>{{ articles|length }}</strong> article{{ articles|length|pluralize }} published by you</p>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">♕</div>
+            <h3 style="color: #f39c12; margin-bottom: 1rem;">No Publications Yet</h3>
+            <p style="color: #bdc3c7;">You haven't published any articles yet. Start writing to share your chess knowledge!</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        table {
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.5rem !important;
+        }
+
+        .chess-piece {
+            display: none;
+        }
+
+        td:nth-child(2) {
+            max-width: 200px !important;
+        }
+    }
+</style>
+{% endblock %}

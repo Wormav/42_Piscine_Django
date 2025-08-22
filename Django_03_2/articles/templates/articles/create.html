@@ -1,0 +1,158 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}Chess Articles - Create Article{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <h2 style="color: #f39c12; margin-bottom: 2rem; text-align: center;">
+        <span class="chess-piece">✍️</span> Write New Article <span class="chess-piece">♔</span>
+    </h2>
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% csrf_token %}
+
+        <div>
+            <label for="{{ form.title.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #bdc3c7; font-weight: 500;">
+                Title <span style="color: #e74c3c;">*</span>
+            </label>
+            <input type="text"
+                   name="{{ form.title.name }}"
+                   id="{{ form.title.id_for_label }}"
+                   value="{% if form.title.value %}{{ form.title.value }}{% endif %}"
+                   maxlength="64"
+                   required
+                   style="width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ecf0f1; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#f39c12'; this.style.boxShadow='0 0 10px rgba(243, 156, 18, 0.3)'"
+                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.boxShadow='none'"
+                   placeholder="Enter an engaging article title...">
+            {% if form.title.errors %}
+                <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                    {% for error in form.title.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div style="color: #95a5a6; font-size: 0.85rem; margin-top: 0.25rem; text-align: right;">
+                <span id="title-count">0</span>/64 characters
+            </div>
+        </div>
+
+        <div>
+            <label for="{{ form.synopsis.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #bdc3c7; font-weight: 500;">
+                Synopsis <span style="color: #e74c3c;">*</span>
+            </label>
+            <textarea name="{{ form.synopsis.name }}"
+                      id="{{ form.synopsis.id_for_label }}"
+                      rows="3"
+                      maxlength="312"
+                      required
+                      style="width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ecf0f1; font-size: 1rem; resize: vertical; transition: all 0.3s ease; font-family: inherit;"
+                      onfocus="this.style.borderColor='#f39c12'; this.style.boxShadow='0 0 10px rgba(243, 156, 18, 0.3)'"
+                      onblur="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.boxShadow='none'"
+                      placeholder="Write a compelling synopsis that summarizes your article...">{% if form.synopsis.value %}{{ form.synopsis.value }}{% endif %}</textarea>
+            {% if form.synopsis.errors %}
+                <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                    {% for error in form.synopsis.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div style="color: #95a5a6; font-size: 0.85rem; margin-top: 0.25rem; text-align: right;">
+                <span id="synopsis-count">0</span>/312 characters
+            </div>
+        </div>
+
+        <div>
+            <label for="{{ form.content.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #bdc3c7; font-weight: 500;">
+                Content <span style="color: #e74c3c;">*</span>
+            </label>
+            <textarea name="{{ form.content.name }}"
+                      id="{{ form.content.id_for_label }}"
+                      rows="15"
+                      required
+                      style="width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ecf0f1; font-size: 1rem; resize: vertical; transition: all 0.3s ease; font-family: inherit; line-height: 1.6;"
+                      onfocus="this.style.borderColor='#f39c12'; this.style.boxShadow='0 0 10px rgba(243, 156, 18, 0.3)'"
+                      onblur="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.boxShadow='none'"
+                      placeholder="Share your chess knowledge, strategies, analysis, or stories...">{% if form.content.value %}{{ form.content.value }}{% endif %}</textarea>
+            {% if form.content.errors %}
+                <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                    {% for error in form.content.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+            <div style="color: #e74c3c; background: rgba(231, 76, 60, 0.1); padding: 0.75rem; border-radius: 5px; border: 1px solid #e74c3c;">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+            <button type="submit"
+                    style="background: linear-gradient(45deg, #27ae60, #2ecc71); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 15px rgba(39, 174, 96, 0.4)'"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <span class="chess-piece">📝</span> Publish Article
+            </button>
+
+            <a href="{% url 'articles:publications' %}"
+               style="background: linear-gradient(45deg, #34495e, #2c3e50); color: white; text-decoration: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; display: inline-block;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 15px rgba(52, 73, 94, 0.4)'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <span class="chess-piece">↩️</span> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Character counters
+    document.addEventListener('DOMContentLoaded', function() {
+        const titleField = document.getElementById('{{ form.title.id_for_label }}');
+        const synopsisField = document.getElementById('{{ form.synopsis.id_for_label }}');
+        const titleCount = document.getElementById('title-count');
+        const synopsisCount = document.getElementById('synopsis-count');
+
+        function updateCount(field, counter) {
+            counter.textContent = field.value.length;
+        }
+
+        // Initial count
+        updateCount(titleField, titleCount);
+        updateCount(synopsisField, synopsisCount);
+
+        // Update on input
+        titleField.addEventListener('input', () => updateCount(titleField, titleCount));
+        synopsisField.addEventListener('input', () => updateCount(synopsisField, synopsisCount));
+    });
+</script>
+
+<style>
+    input::placeholder, textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+
+        .chess-piece {
+            display: none;
+        }
+
+        div[style*="display: flex"] {
+            flex-direction: column;
+        }
+
+        button, a {
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}

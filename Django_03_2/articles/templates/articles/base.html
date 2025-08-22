@@ -154,6 +154,9 @@
         <nav class="nav">
             <a href="{% url 'articles:list' %}">Articles</a>
             {% if user.is_authenticated %}
+                <a href="{% url 'articles:create' %}" style="background: rgba(39, 174, 96, 0.7);">Write Article</a>
+                <a href="{% url 'articles:publications' %}">My Publications</a>
+                <a href="{% url 'articles:favourites' %}">Favourites</a>
                 {% if user.is_superuser %}
                     <a href="{% url 'admin:index' %}">Admin</a>
                 {% endif %}

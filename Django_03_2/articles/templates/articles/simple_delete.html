@@ -1,0 +1,28 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}Delete Article{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; padding: 30px; background: white; border-radius: 10px;">
+    <h1 style="color: red;">Delete Article</h1>
+
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+        <h3>{{ article.title }}</h3>
+        <p>By {{ article.author.username }} • {{ article.created|date:"F d, Y" }}</p>
+    </div>
+
+    <p style="color: #666; margin: 20px 0;">
+        This action cannot be undone. Are you sure you want to permanently delete this article?
+    </p>
+
+    <form method="post" action="{% url 'articles:delete' article.pk %}">
+        {% csrf_token %}
+        <button type="submit" style="background: red; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-right: 10px; cursor: pointer;">
+            Delete Article
+        </button>
+        <a href="{% url 'articles:publications' %}" style="background: gray; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+            Cancel
+        </a>
+    </form>
+</div>
+{% endblock %}
