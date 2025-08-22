@@ -1,0 +1,72 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}Chess Articles - All Articles{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #f39c12; margin-bottom: 1.5rem; text-align: center;">
+        <span class="chess-piece">♗</span> All Chess Articles <span class="chess-piece">♙</span>
+    </h2>
+
+    {% if articles %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden;">
+                <thead>
+                    <tr style="background: rgba(243, 156, 18, 0.8);">
+                        <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Title</th>
+                        <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Author</th>
+                        <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Created</th>
+                        <th style="padding: 1rem; text-align: left; color: #2c3e50; font-weight: bold;">Synopsis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in articles %}
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease;"
+                            onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'"
+                            onmouseout="this.style.background='transparent'">
+                            <td style="padding: 1rem; font-weight: 500; color: #f39c12;">
+                                {{ article.title }}
+                            </td>
+                            <td style="padding: 1rem; color: #bdc3c7;">
+                                {{ article.author.username }}
+                            </td>
+                            <td style="padding: 1rem; color: #95a5a6;">
+                                {{ article.created|date:"M d, Y H:i" }}
+                            </td>
+                            <td style="padding: 1rem; color: #ecf0f1; line-height: 1.4;">
+                                {{ article.synopsis }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: center; color: #bdc3c7;">
+            <p><strong>{{ articles|length }}</strong> article{{ articles|length|pluralize }} available</p>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">♕</div>
+            <h3 style="color: #f39c12; margin-bottom: 1rem;">No Articles Yet</h3>
+            <p style="color: #bdc3c7;">The chessboard is empty. Start by creating some articles!</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        table {
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.5rem !important;
+        }
+
+        .chess-piece {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}

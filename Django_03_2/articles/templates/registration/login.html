@@ -1,0 +1,93 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}Chess Articles - Login{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h2 style="color: #f39c12; margin-bottom: 2rem; text-align: center;">
+        <span class="chess-piece">♚</span> Login <span class="chess-piece">♛</span>
+    </h2>
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% csrf_token %}
+
+        <div>
+            <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #bdc3c7; font-weight: 500;">
+                Username:
+            </label>
+            <input type="text"
+                   name="{{ form.username.name }}"
+                   id="{{ form.username.id_for_label }}"
+                   value="{% if form.username.value %}{{ form.username.value }}{% endif %}"
+                   required
+                   style="width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ecf0f1; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#f39c12'; this.style.boxShadow='0 0 10px rgba(243, 156, 18, 0.3)'"
+                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.boxShadow='none'">
+            {% if form.username.errors %}
+                <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                    {{ form.username.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.password.id_for_label }}" style="display: block; margin-bottom: 0.5rem; color: #bdc3c7; font-weight: 500;">
+                Password:
+            </label>
+            <input type="password"
+                   name="{{ form.password.name }}"
+                   id="{{ form.password.id_for_label }}"
+                   required
+                   style="width: 100%; padding: 0.75rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #ecf0f1; font-size: 1rem; transition: all 0.3s ease;"
+                   onfocus="this.style.borderColor='#f39c12'; this.style.boxShadow='0 0 10px rgba(243, 156, 18, 0.3)'"
+                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.2)'; this.style.boxShadow='none'">
+            {% if form.password.errors %}
+                <div style="color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem;">
+                    {{ form.password.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        {% if form.non_field_errors %}
+            <div style="color: #e74c3c; background: rgba(231, 76, 60, 0.1); padding: 0.75rem; border-radius: 5px; border: 1px solid #e74c3c;">
+                {{ form.non_field_errors.0 }}
+            </div>
+        {% endif %}
+
+        <button type="submit"
+                style="background: linear-gradient(45deg, #f39c12, #e67e22); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;"
+                onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 15px rgba(243, 156, 18, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <span class="chess-piece">♔</span> Login <span class="chess-piece">♔</span>
+        </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+        <p style="color: #bdc3c7;">
+            Need an account?
+            <a href="{% url 'articles:signup' %}" style="color: #27ae60; text-decoration: none; font-weight: 500; transition: color 0.3s ease;"
+               onmouseover="this.style.color='#2ecc71'"
+               onmouseout="this.style.color='#27ae60'">
+                Sign up here
+            </a>
+        </p>
+    </div>
+</div>
+
+<style>
+    input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    @media (max-width: 768px) {
+        .card {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+
+        .chess-piece {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
