@@ -45,6 +45,13 @@ class RegisterView(CreateView):
     template_name = "articles/register.html"
     success_url = reverse_lazy("articles:home")
 
+    def dispatch(self, request, *args, **kwargs):
+        # Redirect authenticated users to home page
+        if request.user.is_authenticated:
+            messages.info(request, "You are already logged in.")
+            return redirect("articles:home")
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         user = form.save()
         login(self.request, user)
