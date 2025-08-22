@@ -24,7 +24,7 @@ class ArticleListView(ListView):
     model = Article
     template_name = "articles/list.html"
     context_object_name = "articles"
-    queryset = Article.objects.select_related("author").all()
+    queryset = Article.objects.select_related("author").order_by("-created")
 
 
 class CustomLoginView(LoginView):
@@ -38,11 +38,11 @@ class CustomLoginView(LoginView):
         return super().form_invalid(form)
 
 
-class SignUpView(CreateView):
-    """User registration view"""
+class RegisterView(CreateView):
+    """User registration view using CreateView only"""
 
     form_class = UserCreationForm
-    template_name = "registration/signup.html"
+    template_name = "articles/register.html"
     success_url = reverse_lazy("articles:home")
 
     def form_valid(self, form):
@@ -111,25 +111,61 @@ class UserFavouritesView(LoginRequiredMixin, ListView):
         ).select_related("article")
 
 
-class ArticleCreateView(LoginRequiredMixin, CreateView):
-    """Create a new article"""
+class PublishView(LoginRequiredMixin, CreateView):
+    """Publish a new article using CreateView only"""
 
     model = Article
     form_class = ArticleForm
-    template_name = "articles/create.html"
+    template_name = "articles/publish.html"
     success_url = reverse_lazy("articles:publications")
 
     def form_valid(self, form):
+        # Author field filled automatically during validation
         form.instance.author = self.request.user
         messages.success(
             self.request,
-            f"Article '{form.instance.title}' has been created successfully!",
+            f"Article '{form.instance.title}' has been published successfully!",
         )
         return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(self.request, "Please correct the errors below.")
         return super().form_invalid(form)
+
+
+class AddToFavouriteView(LoginRequiredMixin, CreateView):
+    """Add article to favourites using CreateView only"""
+
+    model = UserFavouriteArticle
+    fields = []  # No visible fields in the form
+    template_name = "articles/add_favourite.html"
+
+    def get_success_url(self):
+        return reverse_lazy("articles:detail", kwargs={"pk": self.kwargs["pk"]})
+
+    def form_valid(self, form):
+        # Article field pre-filled with current article ID
+        article = get_object_or_404(Article, pk=self.kwargs["pk"])
+        form.instance.article = article
+        # User field filled with connected user ID during validation
+        form.instance.user = self.request.user
+
+        # Check if already in favourites
+        if UserFavouriteArticle.objects.filter(
+            user=self.request.user, article=article
+        ).exists():
+            messages.warning(
+                self.request, f"'{article.title}' is already in your favourites."
+            )
+            return redirect(self.get_success_url())
+
+        messages.success(self.request, f"Added '{article.title}' to your favourites!")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["article"] = get_object_or_404(Article, pk=self.kwargs["pk"])
+        return context
 
 
 class ToggleFavouriteView(LoginRequiredMixin, View):

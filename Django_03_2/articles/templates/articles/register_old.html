@@ -1,0 +1,100 @@
+{% extends 'articles/base.html' %}
+{% load static %}
+
+{% block title %}Register - Chess Articles{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto; padding: 30px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+    <h2 style="color: #f39c12; margin-bottom: 1.5rem; text-align: center;">
+        <span class="chess-piece">♔</span> Register <span class="chess-piece">♕</span>
+    </h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 10px; margin-bottom: 15px; border-radius: 5px;
+                        background-color: {% if message.tags == 'error' %}#f8d7da{% else %}#d4edda{% endif %};
+                        color: {% if message.tags == 'error' %}#721c24{% else %}#155724{% endif %};">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div style="margin-bottom: 20px;">
+            <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: bold;">
+                Login (Username):
+            </label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                    {{ form.username.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="{{ form.password1.id_for_label }}" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: bold;">
+                Password:
+            </label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                    {{ form.password1.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="{{ form.password2.id_for_label }}" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: bold;">
+                Password Confirmation:
+            </label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div style="color: #dc3545; font-size: 14px; margin-top: 5px;">
+                    {{ form.password2.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <button type="submit" style="background: linear-gradient(45deg, #f39c12, #e67e22); color: white; padding: 12px 30px; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">
+                <span class="chess-piece">♗</span> Create Account
+            </button>
+        </div>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <p style="color: #7f8c8d;">
+            Already have an account?
+            <a href="{% url 'articles:login' %}" style="color: #3498db; text-decoration: none; font-weight: bold;">
+                Login here
+            </a>
+        </p>
+    </div>
+</div>
+
+<style>
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #bdc3c7;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus {
+        outline: none;
+        border-color: #f39c12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+    }
+</style>
+{% endblock %}

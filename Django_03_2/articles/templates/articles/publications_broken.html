@@ -58,3 +58,36 @@
     </div>
 </div>
 {% endblock %}
+
+        <div style="margin-top: 1.5rem; text-align: center; color: #bdc3c7;">
+            <p><strong>{{ articles|length }}</strong> article{{ articles|length|pluralize }} published by you</p>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">♕</div>
+            <h3 style="color: #f39c12; margin-bottom: 1rem;">No Publications Yet</h3>
+            <p style="color: #bdc3c7;">You haven't published any articles yet. Start writing to share your chess knowledge!</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        table {
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.5rem !important;
+        }
+
+        .chess-piece {
+            display: none;
+        }
+
+        td:nth-child(2) {
+            max-width: 200px !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -51,3 +51,47 @@
     </div>
 </div>
 {% endblock %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center; color: #bdc3c7; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p><strong>{{ favourites|length }}</strong> favourite article{{ favourites|length|pluralize }} in your collection</p>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">💝</div>
+            <h3 style="color: #f39c12; margin-bottom: 1rem;">No Favourites Yet</h3>
+            <p style="color: #bdc3c7; margin-bottom: 2rem;">You haven't added any articles to your favourites. Start exploring and save interesting articles!</p>
+            <a href="{% url 'articles:list' %}"
+               style="background: linear-gradient(45deg, #f39c12, #e67e22); color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; display: inline-block;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(243, 156, 18, 0.4)'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <span class="chess-piece">♗</span> Browse Articles
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    @media (max-width: 768px) {
+        .card {
+            padding: 1.5rem;
+        }
+
+        div[style*="display: flex"] {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+
+        .chess-piece {
+            display: none;
+        }
+
+        div[style*="text-align: right"] {
+            text-align: left !important;
+        }
+    }
+</style>
+{% endblock %}

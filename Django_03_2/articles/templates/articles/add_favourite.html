@@ -1,0 +1,47 @@
+{% extends 'articles/base.html' %}
+{% load static %}
+
+{% block title %}Add to Favourites - Chess Articles{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; padding: 30px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center;">
+    <h2 style="color: #f39c12; margin-bottom: 1.5rem;">
+        <span class="chess-piece">⭐</span> Add to Favourites <span class="chess-piece">❤️</span>
+    </h2>
+
+    <div style="background: white; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #f39c12;">
+        <h3 style="color: #2c3e50; margin-bottom: 10px;">{{ article.title }}</h3>
+        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 10px;">
+            By {{ article.author.username }} • {{ article.created|date:"F d, Y" }}
+        </p>
+        <p style="color: #555; font-style: italic;">{{ article.synopsis }}</p>
+    </div>
+
+    <p style="color: #666; margin: 20px 0;">
+        Do you want to add this article to your favourites?
+    </p>
+
+    <!-- Form with no visible fields -->
+    <form method="post">
+        {% csrf_token %}
+        <!-- Article ID is pre-filled automatically in the view -->
+        <!-- User ID will be filled during validation -->
+
+        <div style="margin-top: 30px;">
+            <button type="submit" style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; padding: 12px 30px; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-right: 15px;">
+                <span class="chess-piece">⭐</span> Add to Favourites
+            </button>
+            <a href="{% url 'articles:detail' article.pk %}" style="background: linear-gradient(45deg, #95a5a6, #7f8c8d); color: white; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; text-decoration: none; transition: all 0.3s ease;">
+                <span class="chess-piece">↩️</span> Back to Article
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    button:hover, a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+</style>
+{% endblock %}

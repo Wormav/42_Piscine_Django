@@ -3,192 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Chess Articles{% endblock %}</title>
+    <title>{% block title %}Articles{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: #ecf0f1;
-            min-height: 100vh;
-            line-height: 1.6;
+            background-color: #f8f9fa;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        .navbar {
+            background-color: #000000 !important;
         }
 
-        .header {
-            background: rgba(0, 0, 0, 0.3);
+        .navbar-brand {
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            color: #ffffff !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #17a2b8 !important;
+        }
+
+        .form-control {
+            margin-right: 5px;
+        }
+
+        .btn-login {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-login:hover {
+            background-color: #138496;
+            border-color: #117a8b;
+        }
+
+        .table {
+            background-color: white;
+        }
+
+        .btn-read {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-read:hover {
+            background-color: #138496;
+            border-color: #117a8b;
+            color: white;
+        }
+        .main-header {
+            background-color: transparent;
             padding: 1rem 0;
-            margin-bottom: 2rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #dee2e6;
         }
 
-        .header h1 {
-            text-align: center;
-            color: #f39c12;
+        .main-header h1 {
             font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #212529;
+            margin: 0;
+            display: inline;
         }
 
-        .header .subtitle {
-            text-align: center;
-            color: #bdc3c7;
+        .main-header p {
             font-size: 1.1rem;
-        }
-
-        .nav {
-            background: rgba(52, 73, 94, 0.8);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .nav a {
-            color: #ecf0f1;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav a:hover {
-            background: #f39c12;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .chessboard-pattern {
-            background-image:
-                linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%),
-                linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.1) 75%),
-                linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.1) 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
-
-        .messages {
-            margin-bottom: 1rem;
-        }
-
-        .message {
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .message.error {
-            background: rgba(231, 76, 60, 0.8);
-            border: 1px solid #e74c3c;
-        }
-
-        .message.success {
-            background: rgba(46, 204, 113, 0.8);
-            border: 1px solid #27ae60;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 2rem 0;
-            color: #bdc3c7;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            margin-top: 3rem;
-        }
-
-        .chess-piece {
-            display: inline-block;
-            font-size: 1.5rem;
-            margin: 0 0.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .nav {
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
-            }
+            color: #6c757d;
+            margin: 0;
+            display: inline;
+            margin-left: 1rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header chessboard-pattern">
-            <h1><span class="chess-piece">♔</span>Chess Articles<span class="chess-piece">♛</span></h1>
-            <p class="subtitle">Strategic insights and tactical analysis</p>
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <h1>Articles</h1>
+            <p>Share your writings</p>
         </div>
+    </header>
 
-        <nav class="nav">
-            <a href="{% url 'articles:list' %}">Articles</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'articles:create' %}" style="background: rgba(39, 174, 96, 0.7);">Write Article</a>
-                <a href="{% url 'articles:publications' %}">My Publications</a>
-                <a href="{% url 'articles:favourites' %}">Favourites</a>
-                {% if user.is_superuser %}
-                    <a href="{% url 'admin:index' %}">Admin</a>
-                {% endif %}
-                <span style="color: #f39c12; padding: 0.5rem 1rem; background: rgba(243, 156, 18, 0.2); border-radius: 5px;">
-                    Welcome, {{ user.username }}
-                </span>
-                <a href="{% url 'articles:logout' %}" style="background: rgba(231, 76, 60, 0.7);">Logout</a>
-            {% else %}
-                <a href="{% url 'articles:login' %}">Login</a>
-                <a href="{% url 'articles:signup' %}" style="background: rgba(39, 174, 96, 0.7);">Sign Up</a>
-            {% endif %}
-        </nav>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message {{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'articles:home' %}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'articles:list' %}">Last Articles</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'articles:favourites' %}">Favourites</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'articles:publications' %}">Publications</a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    {% if user.is_authenticated %}
+                        <span class="navbar-text me-3">
+                            Logged as {{ user.username }}
+                        </span>
+                        <a href="{% url 'articles:logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+                    {% else %}
+                        <a href="{% url 'articles:register' %}" class="btn btn-outline-success btn-sm me-2">Register</a>
+                        <!-- Login form integrated in navbar -->
+                        <form method="post" action="{% url 'articles:login' %}" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <input type="text" name="username" class="form-control form-control-sm me-1" placeholder="username" required style="width: 120px;">
+                            <input type="password" name="password" class="form-control form-control-sm me-1" placeholder="password" required style="width: 120px;">
+                            <button type="submit" class="btn btn-login btn-sm">Login</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
         {% endif %}
 
-        <main>
-            {% block content %}
-            {% endblock %}
-        </main>
-
-        <footer class="footer">
-            <p><span class="chess-piece">♖</span> Chess Articles Platform <span class="chess-piece">♘</span></p>
-            <p>Master your game, one article at a time</p>
-        </footer>
+        {% block content %}
+        {% endblock %}
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
