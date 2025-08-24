@@ -9,10 +9,18 @@ def home(request):
     Vue pour la page d'accueil - redirige selon l'authentification
     """
     if request.user.is_authenticated:
-        chatrooms = ChatRoom.objects.all()
-        return render(request, "chat/home.html", {"chatrooms": chatrooms})
+        return redirect("chat:chat_home")
     else:
         return redirect("account:signin")
+
+
+@login_required
+def chat_home(request):
+    """
+    Vue pour la page d'accueil du chat - accessible uniquement aux utilisateurs connectés
+    """
+    chatrooms = ChatRoom.objects.all()
+    return render(request, "chat/home.html", {"chatrooms": chatrooms})
 
 
 @login_required

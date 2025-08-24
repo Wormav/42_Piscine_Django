@@ -1,7 +1,7 @@
 import json
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect, render
@@ -14,7 +14,7 @@ def signin_view(request):
     Vue pour la page de signin.
     """
     if request.user.is_authenticated:
-        return redirect("home")
+        return redirect("chat:home")
     return render(request, "account/signin.html")
 
 
@@ -23,7 +23,7 @@ def signup_view(request):
     Vue pour la page de signup.
     """
     if request.user.is_authenticated:
-        return redirect("home")
+        return redirect("chat:home")
     return render(request, "account/signup.html")
 
 
@@ -75,17 +75,43 @@ def signup_ajax(request):
         password1 = data.get("password1")
         password2 = data.get("password2")
 
-        form = UserCreationForm(
-            data={"username": username, "password1": password1, "password2": password2}
-        )
+        # Validation manuelle
+        errors = {}
 
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return JsonResponse({"success": True, "username": user.username})
+        if not username:
+            errors["username"] = ["Ce champ est obligatoire."]
+        elif len(username) < 3:
+            errors["username"] = [
+                "Le nom d'utilisateur doit contenir au moins 3 caractères."
+            ]
 
-        # Return form errors
-        return JsonResponse({"success": False, "errors": form.errors})
+        if not password1:
+            errors["password1"] = ["Ce champ est obligatoire."]
+        elif len(password1) < 8:
+            errors["password1"] = [
+                "Le mot de passe doit contenir au moins 8 caractères."
+            ]
+
+        if not password2:
+            errors["password2"] = ["Ce champ est obligatoire."]
+        elif password1 != password2:
+            errors["password2"] = ["Les deux mots de passe ne correspondent pas."]
+
+        # Vérifier si l'utilisateur existe déjà
+        from .models import CustomUser
+
+        if username and CustomUser.objects.filter(username=username).exists():
+            errors["username"] = ["Un utilisateur avec ce nom existe déjà."]
+
+        if errors:
+            return JsonResponse({"success": False, "errors": errors})
+
+        # Créer l'utilisateur
+        user = CustomUser.objects.create_user(username=username, password=password1)
+
+        # Connecter l'utilisateur
+        login(request, user)
+        return JsonResponse({"success": True, "username": user.username})
 
     except json.JSONDecodeError:
         return JsonResponse(

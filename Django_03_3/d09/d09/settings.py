@@ -127,3 +127,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom User Model
 AUTH_USER_MODEL = "account.CustomUser"
+
+# Login URL - redirect unauthenticated users here
+LOGIN_URL = "/account/signin/"
