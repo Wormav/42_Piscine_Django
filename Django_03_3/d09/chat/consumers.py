@@ -10,6 +10,9 @@ User = get_user_model()
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    # Class variable to store connected users per room
+    connected_users = {}
+
     @database_sync_to_async
     def get_room(self, room_name):
         """Get or create chatroom"""
@@ -46,6 +49,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
         return result
 
+    def add_user_to_room(self, room_name, username):
+        """Add user to the connected users list for a room"""
+        if room_name not in self.connected_users:
+            self.connected_users[room_name] = set()
+        self.connected_users[room_name].add(username)
+
+    def remove_user_from_room(self, room_name, username):
+        """Remove user from the connected users list for a room"""
+        if room_name in self.connected_users:
+            self.connected_users[room_name].discard(username)
+            if not self.connected_users[room_name]:
+                del self.connected_users[room_name]
+
+    def get_room_users(self, room_name):
+        """Get list of connected users for a room"""
+        return list(self.connected_users.get(room_name, set()))
+
     async def connect(self):
         """
         Called when a WebSocket connection is established
@@ -68,6 +88,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
 
         await self.accept()
+
+        # Add user to connected users list (Exercise 03)
+        username = self.scope["user"].username
+        self.add_user_to_room(self.room_name, username)
 
         # Send the last 3 messages when user connects (Exercise 02)
         last_messages = await self.get_last_messages(self.room)
@@ -102,6 +126,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             },
         )
 
+        # Send updated user list to all group members (Exercise 03)
+        users_list = self.get_room_users(self.room_name)
+        await self.channel_layer.group_send(  # type: ignore
+            self.room_group_name,
+            {
+                "type": "user_list_update",
+                "users": users_list,
+            },
+        )
+
     async def disconnect(self, code):
         """
         Called when a WebSocket connection is closed
@@ -126,6 +160,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     "type": "user_left",
                     "username": username,
+                },
+            )
+
+            # Remove user from connected users list (Exercise 03)
+            self.remove_user_from_room(self.room_name, username)
+
+            # Send updated user list to remaining group members (Exercise 03)
+            users_list = self.get_room_users(self.room_name)
+            await self.channel_layer.group_send(  # type: ignore
+                self.room_group_name,
+                {
+                    "type": "user_list_update", 
+                    "users": users_list,
                 },
             )
 
@@ -210,6 +257,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "type": "user_left",
                     "message": f"{username} has left the chat",
                     "username": username,
+                }
+            )
+        )
+
+    async def user_list_update(self, event):
+        """
+        Called when the user list needs to be updated (Exercise 03)
+        """
+        users = event["users"]
+
+        # Send updated user list to WebSocket
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "user_list_update",
+                    "users": users,
                 }
             )
         )
