@@ -25,6 +25,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
             room=room, user=user, message_type=message_type, content=content
         )
 
+    @database_sync_to_async
+    def get_last_messages(self, room):
+        """Get the last 3 messages from the room with all needed data (Exercise 02)"""
+        messages = (
+            Message.objects.filter(room=room)
+            .select_related("user")
+            .order_by("-timestamp")[:3]
+        )
+        # Return in chronological order (oldest to newest) with all data
+        result = []
+        for message in reversed(messages):
+            result.append(
+                {
+                    "content": message.content,
+                    "username": message.user.username,  # type: ignore
+                    "timestamp": message.timestamp.strftime("%H:%M:%S"),
+                    "message_type": message.message_type,
+                }
+            )
+        return result
+
     async def connect(self):
         """
         Called when a WebSocket connection is established
@@ -47,6 +68,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
 
         await self.accept()
+
+        # Send the last 3 messages when user connects (Exercise 02)
+        last_messages = await self.get_last_messages(self.room)
+        for message_data in last_messages:
+            await self.send(
+                text_data=json.dumps(
+                    {
+                        "type": "chat_message",
+                        "message": message_data["content"],
+                        "username": message_data["username"],
+                        "timestamp": message_data["timestamp"],
+                        "message_type": message_data["message_type"],
+                    }
+                )
+            )
 
         # Save join message to database
         username = self.scope["user"].username
