@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -130,3 +132,9 @@ AUTH_USER_MODEL = "account.CustomUser"
 
 # Login URL - redirect unauthenticated users here
 LOGIN_URL = "/account/signin/"
+
+# Channels configuration
+ASGI_APPLICATION = "d09.asgi.application"
+
+# Channel layer configuration (using in-memory for development)
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}

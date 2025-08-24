@@ -175,21 +175,63 @@ $(document).ready(function() {
     const messageForm = $('#message-form');
     const messageInput = $('#message-input');
 
-    // WebSocket connection will be implemented here later
-    // For now, we'll add a system message when user joins
-    addSystemMessage(username + ' has joined the chat');
+    // Créer la connexion WebSocket
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = protocol + '//' + window.location.host + '/ws/chat/' + roomName + '/';
+    const chatSocket = new WebSocket(wsUrl);
+
+    // Gestion des événements WebSocket
+    chatSocket.onopen = function(e) {
+        console.log('WebSocket connecté');
+    };
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        switch(data.type) {
+            case 'message':
+                if (data.username === username) {
+                    addUserMessage(data.username, data.message);
+                } else {
+                    addOtherMessage(data.username, data.message);
+                }
+                break;
+            case 'user_joined':
+                addSystemMessage(data.message);
+                break;
+            case 'user_left':
+                addSystemMessage(data.message);
+                break;
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.log('WebSocket fermé');
+        addSystemMessage('Connexion fermée. Actualisez la page pour reconnecter.');
+    };
+
+    chatSocket.onerror = function(e) {
+        console.error('Erreur WebSocket:', e);
+        addSystemMessage('Erreur de connexion.');
+    };
 
     // Handle message form submission
     messageForm.on('submit', function(e) {
         e.preventDefault();
 
         const message = messageInput.val().trim();
-        if (message) {
-            // For now, just add the message locally
-            // Later this will be sent via WebSocket
-            addUserMessage(username, message);
+        if (message && chatSocket.readyState === WebSocket.OPEN) {
+            // Envoyer le message via WebSocket
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
             messageInput.val('');
         }
+    });
+
+    // Fermer la connexion WebSocket avant de quitter la page
+    window.addEventListener('beforeunload', function() {
+        chatSocket.close();
     });
 
     // Auto-scroll to bottom
@@ -197,11 +239,11 @@ $(document).ready(function() {
         chatMessages.scrollTop(chatMessages[0].scrollHeight);
     }
 
-    // Add a user message
+    // Add a user message (message de l'utilisateur actuel)
     function addUserMessage(username, message) {
         const messageHtml = `
             <div class="message user-message">
-                <div class="message-username">${username}</div>
+                <div class="message-username">${escapeHtml(username)}</div>
                 <p class="message-content">${escapeHtml(message)}</p>
                 <div class="message-time">${getCurrentTime()}</div>
             </div>
@@ -210,11 +252,11 @@ $(document).ready(function() {
         scrollToBottom();
     }
 
-    // Add an other user message
+    // Add an other user message (message d'un autre utilisateur)
     function addOtherMessage(username, message) {
         const messageHtml = `
             <div class="message other-message">
-                <div class="message-username">${username}</div>
+                <div class="message-username">${escapeHtml(username)}</div>
                 <p class="message-content">${escapeHtml(message)}</p>
                 <div class="message-time">${getCurrentTime()}</div>
             </div>
