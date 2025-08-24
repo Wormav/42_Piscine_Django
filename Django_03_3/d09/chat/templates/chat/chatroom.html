@@ -173,7 +173,28 @@
         </div>
 
         <div class="chat-messages" id="chat-messages">
-            <!-- Messages will be populated here by JavaScript -->
+            <!-- Existing messages -->
+            {% for message in messages %}
+                {% if message.message_type == 'message' %}
+                    {% if message.user.username == user.username %}
+                        <div class="message user-message">
+                            <div class="message-username">{{ message.user.username }}</div>
+                            <p class="message-content">{{ message.content }}</p>
+                            <div class="message-time">{{ message.timestamp|date:"H:i" }}</div>
+                        </div>
+                    {% else %}
+                        <div class="message other-message">
+                            <div class="message-username">{{ message.user.username }}</div>
+                            <p class="message-content">{{ message.content }}</p>
+                            <div class="message-time">{{ message.timestamp|date:"H:i" }}</div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="message system-message">
+                        <p class="message-content">{{ message.content }}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
 
         <div class="chat-input">
@@ -199,6 +220,9 @@ $(document).ready(function() {
     const chatMessages = $('#chat-messages');
     const messageForm = $('#message-form');
     const messageInput = $('#message-input');
+
+    // Scroll to bottom on page load
+    scrollToBottom();
 
     // Create WebSocket connection
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

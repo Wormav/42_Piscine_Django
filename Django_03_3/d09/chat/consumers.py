@@ -1,12 +1,30 @@
 import json
 
+from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
+
+from .models import ChatRoom, Message
 
 User = get_user_model()
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    @database_sync_to_async
+    def get_room(self, room_name):
+        """Get or create chatroom"""
+        try:
+            return ChatRoom.objects.get(name=room_name)
+        except ChatRoom.DoesNotExist:
+            return None
+
+    @database_sync_to_async
+    def save_message(self, room, user, message_type, content):
+        """Save message to database"""
+        return Message.objects.create(
+            room=room, user=user, message_type=message_type, content=content
+        )
+
     async def connect(self):
         """
         Called when a WebSocket connection is established
@@ -19,13 +37,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
+        # Get the chatroom
+        self.room = await self.get_room(self.room_name)
+        if not self.room:
+            await self.close()
+            return
+
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
 
         await self.accept()
 
-        # Send join message to all group members
+        # Save join message to database
         username = self.scope["user"].username
+        await self.save_message(
+            self.room,
+            self.scope["user"],
+            "user_joined",
+            f"{username} has joined the chat",
+        )
+
+        # Send join message to all group members
         await self.channel_layer.group_send(  # type: ignore
             self.room_group_name,
             {
@@ -38,9 +70,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         Called when a WebSocket connection is closed
         """
-        if hasattr(self, "room_group_name") and not self.scope["user"].is_anonymous:
-            # Send disconnect message
+        if (
+            hasattr(self, "room_group_name")
+            and not self.scope["user"].is_anonymous
+            and hasattr(self, "room")
+        ):
+            # Save leave message to database
             username = self.scope["user"].username
+            await self.save_message(
+                self.room,
+                self.scope["user"],
+                "user_left",
+                f"{username} has left the chat",
+            )
+
+            # Send disconnect message
             await self.channel_layer.group_send(  # type: ignore
                 self.room_group_name,
                 {
@@ -63,6 +107,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 text_data_json = json.loads(text_data)
                 message = text_data_json["message"]
                 username = self.scope["user"].username
+
+                # Save message to database
+                await self.save_message(
+                    self.room, self.scope["user"], "message", message
+                )
 
                 # Send message to all group members
                 await self.channel_layer.group_send(  # type: ignore
