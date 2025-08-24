@@ -9,22 +9,22 @@ User = get_user_model()
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         """
-        Appelé quand une connexion WebSocket est établie
+        Called when a WebSocket connection is established
         """
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
 
-        # Vérifier si l'utilisateur est authentifié
+        # Check if user is authenticated
         if self.scope["user"].is_anonymous:
             await self.close()
             return
 
-        # Rejoindre le groupe de la room
+        # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
 
         await self.accept()
 
-        # Envoyer un message de connexion à tous les membres du groupe
+        # Send join message to all group members
         username = self.scope["user"].username
         await self.channel_layer.group_send(  # type: ignore
             self.room_group_name,
@@ -36,10 +36,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, code):
         """
-        Appelé quand une connexion WebSocket est fermée
+        Called when a WebSocket connection is closed
         """
         if hasattr(self, "room_group_name") and not self.scope["user"].is_anonymous:
-            # Envoyer un message de déconnexion
+            # Send disconnect message
             username = self.scope["user"].username
             await self.channel_layer.group_send(  # type: ignore
                 self.room_group_name,
@@ -49,14 +49,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 },
             )
 
-            # Quitter le groupe de la room
+            # Leave room group
             await self.channel_layer.group_discard(  # type: ignore
                 self.room_group_name, self.channel_name
             )
 
     async def receive(self, text_data=None, bytes_data=None):
         """
-        Appelé quand un message est reçu du WebSocket
+        Called when a message is received from WebSocket
         """
         if text_data:
             try:
@@ -64,7 +64,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message = text_data_json["message"]
                 username = self.scope["user"].username
 
-                # Envoyer le message à tous les membres du groupe
+                # Send message to all group members
                 await self.channel_layer.group_send(  # type: ignore
                     self.room_group_name,
                     {
@@ -74,17 +74,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     },
                 )
             except (json.JSONDecodeError, KeyError):
-                # Ignorer les messages malformés
+                # Ignore malformed messages
                 pass
 
     async def chat_message(self, event):
         """
-        Appelé quand un message de chat est reçu du groupe
+        Called when a chat message is received from the group
         """
         message = event["message"]
         username = event["username"]
 
-        # Envoyer le message au WebSocket
+        # Send message to WebSocket
         await self.send(
             text_data=json.dumps(
                 {
@@ -97,11 +97,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def user_joined(self, event):
         """
-        Appelé quand un utilisateur rejoint le chat
+        Called when a user joins the chat
         """
         username = event["username"]
 
-        # Envoyer le message de connexion au WebSocket
+        # Send join message to WebSocket
         await self.send(
             text_data=json.dumps(
                 {
@@ -114,11 +114,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def user_left(self, event):
         """
-        Appelé quand un utilisateur quitte le chat
+        Called when a user leaves the chat
         """
         username = event["username"]
 
-        # Envoyer le message de déconnexion au WebSocket
+        # Send leave message to WebSocket
         await self.send(
             text_data=json.dumps(
                 {

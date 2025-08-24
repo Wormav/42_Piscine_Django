@@ -78,9 +78,9 @@
         <!-- Welcome Card -->
         <div class="welcome-card">
             <div class="welcome-title">
-                <i class="fas fa-comments me-3"></i>Bienvenue dans Chat App
+                <i class="fas fa-comments me-3"></i>Welcome to Chat App
             </div>
-            <p class="lead text-muted">Choisissez une chatroom pour commencer à discuter !</p>
+            <p class="lead text-muted">Choose a chatroom to start chatting!</p>
         </div>
 
         <!-- Chatrooms List -->
@@ -97,8 +97,8 @@
                                 <div class="chatroom-icon">
                                     <i class="fas fa-users"></i>
                                 </div>
-                                <p class="mb-0">Cliquez pour rejoindre cette chatroom</p>
-                                <small class="text-muted">Créée le {{ room.created_at|date:"d/m/Y" }}</small>
+                                <p class="mb-0">Click to join this chatroom</p>
+                                <small class="text-muted">Created on {{ room.created_at|date:"d/m/Y" }}</small>
                             </div>
                         </a>
                     </div>
@@ -109,8 +109,8 @@
                     <div class="chatroom-card">
                         <div class="no-rooms">
                             <i class="fas fa-comments-slash fa-3x mb-3 text-muted"></i>
-                            <h4>Aucune chatroom disponible</h4>
-                            <p>Contactez l'administrateur pour créer des chatrooms.</p>
+                            <h4>No chatrooms available</h4>
+                            <p>Contact the administrator to create chatrooms.</p>
                         </div>
                     </div>
                 </div>

@@ -5,7 +5,7 @@ from .models import CustomUser
 
 class CustomUserCreationForm(UserCreationForm):
     """
-    Formulaire d'inscription personnalisé pour CustomUser.
+    Custom registration form for CustomUser.
     """
 
     class Meta:

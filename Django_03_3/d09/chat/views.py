@@ -17,7 +17,7 @@ def home(request):
 @login_required
 def chat_home(request):
     """
-    Vue pour la page d'accueil du chat - accessible uniquement aux utilisateurs connectés
+    View for the chat home page - only accessible to logged-in users
     """
     chatrooms = ChatRoom.objects.all()
     return render(request, "chat/home.html", {"chatrooms": chatrooms})
@@ -26,7 +26,7 @@ def chat_home(request):
 @login_required
 def chatroom(request, room_name):
     """
-    Vue pour une chatroom spécifique
+    View for a specific chatroom
     """
     try:
         room = ChatRoom.objects.get(name=room_name)
