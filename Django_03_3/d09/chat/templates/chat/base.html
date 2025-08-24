@@ -1,0 +1,133 @@
+{% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Chat App - D09{% endblock %}</title>
+    {% bootstrap_css %}
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            font-weight: 500;
+            color: #495057 !important;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #667eea !important;
+            transform: translateY(-1px);
+        }
+        .btn-outline-primary {
+            border-color: #667eea;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary:hover {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-outline-danger {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-danger:hover {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        .main-content {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+        .username-display {
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-comments me-2"></i>Chat App
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">
+                        Bonjour, <span class="username-display">{{ user.username }}</span>
+                    </span>
+                    <a class="nav-link btn btn-outline-danger btn-sm" href="#" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                {% else %}
+                    <a class="nav-link btn btn-outline-primary btn-sm me-2" href="{% url 'account:signin' %}">
+                        <i class="fas fa-sign-in-alt me-1"></i>Sign In
+                    </a>
+                    <a class="nav-link btn btn-outline-primary btn-sm" href="{% url 'account:signup' %}">
+                        <i class="fas fa-user-plus me-1"></i>Sign Up
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% bootstrap_javascript %}
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    {% if user.is_authenticated %}
+    <script>
+        $(document).ready(function() {
+            $('#logoutBtn').on('click', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: '{% url "account:logout_ajax" %}',
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.href = '{% url "account:signin" %}';
+                        }
+                    },
+                    error: function() {
+                        alert('Erreur lors de la déconnexion. Veuillez réessayer.');
+                    }
+                });
+            });
+        });
+    </script>
+    {% endif %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

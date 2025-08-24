@@ -1,0 +1,121 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}Home - Chat App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .welcome-card {
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .welcome-title {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .chatroom-card {
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .chatroom-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    .chatroom-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .chatroom-header {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        padding: 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    .chatroom-body {
+        padding: 1.5rem;
+        color: #6c757d;
+    }
+    .chatroom-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #667eea;
+    }
+    .no-rooms {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        padding: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="chat-container">
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+            <div class="welcome-title">
+                <i class="fas fa-comments me-3"></i>Bienvenue dans Chat App
+            </div>
+            <p class="lead text-muted">Choisissez une chatroom pour commencer à discuter !</p>
+        </div>
+
+        <!-- Chatrooms List -->
+        <div class="row">
+            {% if chatrooms %}
+                {% for room in chatrooms %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="chatroom-card">
+                        <a href="{% url 'chat:chatroom' room.name %}" class="chatroom-link">
+                            <div class="chatroom-header">
+                                <i class="fas fa-hashtag me-2"></i>{{ room.name }}
+                            </div>
+                            <div class="chatroom-body">
+                                <div class="chatroom-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <p class="mb-0">Cliquez pour rejoindre cette chatroom</p>
+                                <small class="text-muted">Créée le {{ room.created_at|date:"d/m/Y" }}</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="chatroom-card">
+                        <div class="no-rooms">
+                            <i class="fas fa-comments-slash fa-3x mb-3 text-muted"></i>
+                            <h4>Aucune chatroom disponible</h4>
+                            <p>Contactez l'administrateur pour créer des chatrooms.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
