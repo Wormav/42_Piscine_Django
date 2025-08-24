@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In - Chat App</title>
     {% bootstrap_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -129,7 +130,7 @@
 
                     <div class="auth-link">
                         <p class="text-muted mb-0">
-                            Pas de compte ? <a href="{% url 'account:signup' %}">Créer un compte</a>
+                            No account? <a href="{% url 'account:signup' %}">Create an account</a>
                         </p>
                     </div>
                 </div>
@@ -176,7 +177,7 @@
                         }
                     },
                     error: function() {
-                        showErrors({'__all__': ['Erreur réseau. Veuillez réessayer.']});
+                        showErrors({'__all__': ['Network error. Please try again.']});
                     },
                     complete: function() {
                         // Reset button state

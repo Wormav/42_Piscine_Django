@@ -56,12 +56,28 @@
         color: white;
         margin-left: auto;
         border-bottom-right-radius: 5px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        position: relative;
+    }
+    .message.user-message::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        border-radius: 10px;
+        border-bottom-right-radius: 5px;
+        pointer-events: none;
     }
     .message.other-message {
         background: #f8f9fa;
         color: #495057;
         margin-right: auto;
         border-bottom-left-radius: 5px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .message.system-message {
         background: #e9ecef;
@@ -107,10 +123,18 @@
         padding: 1rem 1.5rem;
         font-weight: 600;
         transition: all 0.3s ease;
+        position: relative;
     }
     .btn-send:hover {
         background: linear-gradient(45deg, #5a67d8, #6b46c1);
         transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .btn-send i {
+        transition: transform 0.3s ease;
+    }
+    .btn-send:hover i {
+        transform: translateX(2px);
     }
     .back-btn {
         background: linear-gradient(45deg, #6c757d, #495057);
@@ -136,7 +160,7 @@
 <div class="container">
     <div class="chat-container">
         <a href="{% url 'chat:home' %}" class="back-btn">
-            <i class="fas fa-arrow-left me-2"></i>Retour à l'accueil
+            <i class="fas fa-arrow-left me-2"></i>Back to Home
         </a>
 
         <div class="chat-header">
@@ -144,20 +168,42 @@
                 <i class="fas fa-hashtag me-2"></i>{{ room.name }}
             </h2>
             <p class="text-muted mb-0">
-                <i class="fas fa-users me-1"></i>Chatroom créée le {{ room.created_at|date:"d/m/Y à H:i" }}
+                <i class="fas fa-users me-1"></i>Chatroom created on {{ room.created_at|date:"d/m/Y at H:i" }}
             </p>
         </div>
 
         <div class="chat-messages" id="chat-messages">
-            <!-- Messages will be populated here by JavaScript -->
+            <!-- Existing messages -->
+            {% for message in messages %}
+                {% if message.message_type == 'message' %}
+                    {% if message.user.username == user.username %}
+                        <div class="message user-message">
+                            <div class="message-username">{{ message.user.username }}</div>
+                            <p class="message-content">{{ message.content }}</p>
+                            <div class="message-time">{{ message.timestamp|date:"H:i" }}</div>
+                        </div>
+                    {% else %}
+                        <div class="message other-message">
+                            <div class="message-username">{{ message.user.username }}</div>
+                            <p class="message-content">{{ message.content }}</p>
+                            <div class="message-time">{{ message.timestamp|date:"H:i" }}</div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="message system-message">
+                        <p class="message-content">{{ message.content }}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
 
         <div class="chat-input">
             <form id="message-form">
                 <div class="input-group">
-                    <input type="text" class="form-control" id="message-input" placeholder="Tapez votre message..." maxlength="500" required>
+                    <input type="text" class="form-control" id="message-input" placeholder="Type your message..." maxlength="500" required>
                     <button type="submit" class="btn btn-send">
                         <i class="fas fa-paper-plane"></i>
+                        <span class="visually-hidden">Send</span>
                     </button>
                 </div>
             </form>
@@ -175,21 +221,66 @@ $(document).ready(function() {
     const messageForm = $('#message-form');
     const messageInput = $('#message-input');
 
-    // WebSocket connection will be implemented here later
-    // For now, we'll add a system message when user joins
-    addSystemMessage(username + ' has joined the chat');
+    // Scroll to bottom on page load
+    scrollToBottom();
+
+    // Create WebSocket connection
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = protocol + '//' + window.location.host + '/ws/chat/' + roomName + '/';
+    const chatSocket = new WebSocket(wsUrl);
+
+    // WebSocket event handling
+    chatSocket.onopen = function(e) {
+        console.log('WebSocket connected');
+    };
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        switch(data.type) {
+            case 'message':
+                if (data.username === username) {
+                    addUserMessage(data.username, data.message);
+                } else {
+                    addOtherMessage(data.username, data.message);
+                }
+                break;
+            case 'user_joined':
+                addSystemMessage(data.message);
+                break;
+            case 'user_left':
+                addSystemMessage(data.message);
+                break;
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.log('WebSocket closed');
+        addSystemMessage('Connection closed. Refresh the page to reconnect.');
+    };
+
+    chatSocket.onerror = function(e) {
+        console.error('WebSocket error:', e);
+        addSystemMessage('Connection error.');
+    };
 
     // Handle message form submission
     messageForm.on('submit', function(e) {
         e.preventDefault();
 
         const message = messageInput.val().trim();
-        if (message) {
-            // For now, just add the message locally
-            // Later this will be sent via WebSocket
-            addUserMessage(username, message);
+        if (message && chatSocket.readyState === WebSocket.OPEN) {
+            // Send message via WebSocket
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
             messageInput.val('');
         }
+    });
+
+    // Close WebSocket connection before leaving the page
+    window.addEventListener('beforeunload', function() {
+        chatSocket.close();
     });
 
     // Auto-scroll to bottom
@@ -197,11 +288,11 @@ $(document).ready(function() {
         chatMessages.scrollTop(chatMessages[0].scrollHeight);
     }
 
-    // Add a user message
+    // Add a user message (message de l'utilisateur actuel)
     function addUserMessage(username, message) {
         const messageHtml = `
             <div class="message user-message">
-                <div class="message-username">${username}</div>
+                <div class="message-username">${escapeHtml(username)}</div>
                 <p class="message-content">${escapeHtml(message)}</p>
                 <div class="message-time">${getCurrentTime()}</div>
             </div>
@@ -210,11 +301,11 @@ $(document).ready(function() {
         scrollToBottom();
     }
 
-    // Add an other user message
+    // Add an other user message (message d'un autre utilisateur)
     function addOtherMessage(username, message) {
         const messageHtml = `
             <div class="message other-message">
-                <div class="message-username">${username}</div>
+                <div class="message-username">${escapeHtml(username)}</div>
                 <p class="message-content">${escapeHtml(message)}</p>
                 <div class="message-time">${getCurrentTime()}</div>
             </div>

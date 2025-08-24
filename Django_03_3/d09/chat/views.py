@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .models import ChatRoom
+from .models import ChatRoom, Message
 
 
 def home(request):
@@ -17,7 +17,7 @@ def home(request):
 @login_required
 def chat_home(request):
     """
-    Vue pour la page d'accueil du chat - accessible uniquement aux utilisateurs connectés
+    View for the chat home page - only accessible to logged-in users
     """
     chatrooms = ChatRoom.objects.all()
     return render(request, "chat/home.html", {"chatrooms": chatrooms})
@@ -26,10 +26,14 @@ def chat_home(request):
 @login_required
 def chatroom(request, room_name):
     """
-    Vue pour une chatroom spécifique
+    View for a specific chatroom
     """
     try:
         room = ChatRoom.objects.get(name=room_name)
-        return render(request, "chat/chatroom.html", {"room": room})
+        # Load recent messages (last 50)
+        messages = Message.objects.filter(room=room).order_by("timestamp")[:50]
+        return render(
+            request, "chat/chatroom.html", {"room": room, "messages": messages}
+        )
     except ChatRoom.DoesNotExist:
         return redirect("chat:home")

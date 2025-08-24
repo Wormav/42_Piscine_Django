@@ -20,7 +20,7 @@ def signin_view(request):
 
 def signup_view(request):
     """
-    Vue pour la page de signup.
+    View for the signup page.
     """
     if request.user.is_authenticated:
         return redirect("chat:home")
@@ -75,41 +75,37 @@ def signup_ajax(request):
         password1 = data.get("password1")
         password2 = data.get("password2")
 
-        # Validation manuelle
+        # Manual validation
         errors = {}
 
         if not username:
-            errors["username"] = ["Ce champ est obligatoire."]
+            errors["username"] = ["This field is required."]
         elif len(username) < 3:
-            errors["username"] = [
-                "Le nom d'utilisateur doit contenir au moins 3 caractères."
-            ]
+            errors["username"] = ["Username must contain at least 3 characters."]
 
         if not password1:
-            errors["password1"] = ["Ce champ est obligatoire."]
+            errors["password1"] = ["This field is required."]
         elif len(password1) < 8:
-            errors["password1"] = [
-                "Le mot de passe doit contenir au moins 8 caractères."
-            ]
+            errors["password1"] = ["Password must contain at least 8 characters."]
 
         if not password2:
-            errors["password2"] = ["Ce champ est obligatoire."]
+            errors["password2"] = ["This field is required."]
         elif password1 != password2:
-            errors["password2"] = ["Les deux mots de passe ne correspondent pas."]
+            errors["password2"] = ["The two passwords do not match."]
 
-        # Vérifier si l'utilisateur existe déjà
+        # Check if user already exists
         from .models import CustomUser
 
         if username and CustomUser.objects.filter(username=username).exists():
-            errors["username"] = ["Un utilisateur avec ce nom existe déjà."]
+            errors["username"] = ["A user with this username already exists."]
 
         if errors:
             return JsonResponse({"success": False, "errors": errors})
 
-        # Créer l'utilisateur
+        # Create the user
         user = CustomUser.objects.create_user(username=username, password=password1)
 
-        # Connecter l'utilisateur
+        # Log in the user
         login(request, user)
         return JsonResponse({"success": True, "username": user.username})
 

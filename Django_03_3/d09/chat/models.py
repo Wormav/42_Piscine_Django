@@ -13,3 +13,29 @@ class ChatRoom(models.Model):
 
     class Meta:
         ordering = ["name"]
+
+
+class Message(models.Model):
+    MESSAGE_TYPES = [
+        ("message", "Message"),
+        ("user_joined", "User Joined"),
+        ("user_left", "User Left"),
+    ]
+
+    room = models.ForeignKey(
+        ChatRoom, on_delete=models.CASCADE, related_name="messages"
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    message_type = models.CharField(
+        max_length=20, choices=MESSAGE_TYPES, default="message"
+    )
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        if self.user:
+            return f"{self.user.username}: {self.content[:50]}"
+        return f"System: {self.content[:50]}"
+
+    class Meta:
+        ordering = ["timestamp"]
