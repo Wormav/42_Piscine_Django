@@ -173,28 +173,7 @@
         </div>
 
         <div class="chat-messages" id="chat-messages">
-            <!-- Existing messages -->
-            {% for message in messages %}
-                {% if message.message_type == 'message' %}
-                    {% if message.user.username == user.username %}
-                        <div class="message user-message">
-                            <div class="message-username">{{ message.user.username }}</div>
-                            <p class="message-content">{{ message.content }}</p>
-                            <div class="message-time">{{ message.timestamp|date:"H:i" }}</div>
-                        </div>
-                    {% else %}
-                        <div class="message other-message">
-                            <div class="message-username">{{ message.user.username }}</div>
-                            <p class="message-content">{{ message.content }}</p>
-                            <div class="message-time">{{ message.timestamp|date:"H:i" }}</div>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="message system-message">
-                        <p class="message-content">{{ message.content }}</p>
-                    </div>
-                {% endif %}
-            {% endfor %}
+            <!-- Messages will be loaded via WebSocket (Exercise 02) -->
         </div>
 
         <div class="chat-input">
@@ -238,6 +217,18 @@ $(document).ready(function() {
         const data = JSON.parse(e.data);
 
         switch(data.type) {
+            case 'chat_message':
+                // Handle messages from history (Exercise 02) and real-time messages
+                if (data.message_type === 'message') {
+                    if (data.username === username) {
+                        addUserMessage(data.username, data.message, data.timestamp);
+                    } else {
+                        addOtherMessage(data.username, data.message, data.timestamp);
+                    }
+                } else if (data.message_type === 'user_joined' || data.message_type === 'user_left') {
+                    addSystemMessage(data.message);
+                }
+                break;
             case 'message':
                 if (data.username === username) {
                     addUserMessage(data.username, data.message);
@@ -289,12 +280,13 @@ $(document).ready(function() {
     }
 
     // Add a user message (message de l'utilisateur actuel)
-    function addUserMessage(username, message) {
+    function addUserMessage(username, message, timestamp) {
+        const timeToShow = timestamp || getCurrentTime();
         const messageHtml = `
             <div class="message user-message">
                 <div class="message-username">${escapeHtml(username)}</div>
                 <p class="message-content">${escapeHtml(message)}</p>
-                <div class="message-time">${getCurrentTime()}</div>
+                <div class="message-time">${timeToShow}</div>
             </div>
         `;
         chatMessages.append(messageHtml);
@@ -302,12 +294,13 @@ $(document).ready(function() {
     }
 
     // Add an other user message (message d'un autre utilisateur)
-    function addOtherMessage(username, message) {
+    function addOtherMessage(username, message, timestamp) {
+        const timeToShow = timestamp || getCurrentTime();
         const messageHtml = `
             <div class="message other-message">
                 <div class="message-username">${escapeHtml(username)}</div>
                 <p class="message-content">${escapeHtml(message)}</p>
-                <div class="message-time">${getCurrentTime()}</div>
+                <div class="message-time">${timeToShow}</div>
             </div>
         `;
         chatMessages.append(messageHtml);

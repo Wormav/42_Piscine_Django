@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .models import ChatRoom, Message
+from .models import ChatRoom
 
 
 def home(request):
@@ -30,10 +30,7 @@ def chatroom(request, room_name):
     """
     try:
         room = ChatRoom.objects.get(name=room_name)
-        # Load recent messages (last 50)
-        messages = Message.objects.filter(room=room).order_by("timestamp")[:50]
-        return render(
-            request, "chat/chatroom.html", {"room": room, "messages": messages}
-        )
+        # No longer send messages via template - they will be sent via WebSocket
+        return render(request, "chat/chatroom.html", {"room": room})
     except ChatRoom.DoesNotExist:
         return redirect("chat:home")
