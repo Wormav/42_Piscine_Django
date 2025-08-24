@@ -153,6 +153,60 @@
         text-decoration: none;
         transform: translateY(-2px);
     }
+    
+    /* User list styles (Exercise 03) */
+    .chat-content {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+    }
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    .user-list {
+        width: 250px;
+        background: rgba(255, 255, 255, 0.95);
+        border-left: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+    .user-list-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        text-align: center;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+    }
+    .user-item {
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border-left: 3px solid #667eea;
+    }
+    .user-item:hover {
+        transform: translateX(3px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+    .user-item.current-user {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        font-weight: 600;
+        border-left: 3px solid #fff;
+    }
+    .user-count {
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-align: center;
+        margin-top: 0.5rem;
+    }
 </style>
 {% endblock %}
 
@@ -172,20 +226,37 @@
             </p>
         </div>
 
-        <div class="chat-messages" id="chat-messages">
-            <!-- Messages will be loaded via WebSocket (Exercise 02) -->
-        </div>
-
-        <div class="chat-input">
-            <form id="message-form">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="message-input" placeholder="Type your message..." maxlength="500" required>
-                    <button type="submit" class="btn btn-send">
-                        <i class="fas fa-paper-plane"></i>
-                        <span class="visually-hidden">Send</span>
-                    </button>
+        <div class="chat-content">
+            <div class="chat-main">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be loaded via WebSocket (Exercise 02) -->
                 </div>
-            </form>
+
+                <div class="chat-input">
+                    <form id="message-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="message-input" placeholder="Type your message..." maxlength="500" required>
+                            <button type="submit" class="btn btn-send">
+                                <i class="fas fa-paper-plane"></i>
+                                <span class="visually-hidden">Send</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- User list (Exercise 03) -->
+            <div class="user-list">
+                <div class="user-list-title">
+                    <i class="fas fa-users me-2"></i>Online Users
+                </div>
+                <div id="user-list-container">
+                    <!-- Users will be loaded via WebSocket -->
+                </div>
+                <div class="user-count" id="user-count">
+                    0 users online
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -241,6 +312,10 @@ $(document).ready(function() {
                 break;
             case 'user_left':
                 addSystemMessage(data.message);
+                break;
+            case 'user_list_update':
+                // Update user list (Exercise 03)
+                updateUserList(data.users);
                 break;
         }
     };
@@ -316,6 +391,30 @@ $(document).ready(function() {
         `;
         chatMessages.append(messageHtml);
         scrollToBottom();
+    }
+
+    // Update user list (Exercise 03)
+    function updateUserList(users) {
+        const userListContainer = $('#user-list-container');
+        const userCount = $('#user-count');
+        
+        // Clear current list
+        userListContainer.empty();
+        
+        // Add each user
+        users.forEach(function(user) {
+            const isCurrentUser = user === username;
+            const userHtml = `
+                <div class="user-item ${isCurrentUser ? 'current-user' : ''}">
+                    <i class="fas fa-user me-2"></i>${escapeHtml(user)}${isCurrentUser ? ' (You)' : ''}
+                </div>
+            `;
+            userListContainer.append(userHtml);
+        });
+        
+        // Update user count
+        const countText = users.length === 1 ? '1 user online' : `${users.length} users online`;
+        userCount.text(countText);
     }
 
     // Escape HTML to prevent XSS
