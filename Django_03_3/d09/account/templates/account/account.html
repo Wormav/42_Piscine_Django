@@ -1,0 +1,299 @@
+{% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - D09</title>
+    {% bootstrap_css %}
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .account-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding-top: 8rem;
+        }
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .card-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            text-align: center;
+            padding: 2rem;
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .logged-in-content {
+            text-align: center;
+            padding: 2rem;
+        }
+        .username-display {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 1.5rem;
+        }
+        .fade-transition {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="account-container">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        Account Management
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <!-- Loading State -->
+                    <div id="loading-state" class="text-center p-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Checking authentication status...</p>
+                    </div>
+
+                    <!-- Login Form (shown when not authenticated) -->
+                    <div id="login-form" class="fade-transition" style="display: none;">
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div id="login-errors" class="alert alert-danger" style="display: none;"></div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary" id="loginBtn">
+                                    <span class="btn-text">Sign In</span>
+                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Logged In Content (shown when authenticated) -->
+                    <div id="logged-in-content" class="fade-transition" style="display: none;">
+                        <div class="logged-in-content">
+                            <div class="username-display">
+                                Logged as <span id="username-display" class="text-primary"></span>
+                            </div>
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-danger" id="logoutBtn">
+                                    <span class="btn-text">Logout</span>
+                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% bootstrap_javascript %}
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Check authentication status on page load
+            checkAuthStatus();
+
+            // Handle login form submission
+            $('#loginForm').on('submit', function(e) {
+                e.preventDefault();
+
+                const loginBtn = $('#loginBtn');
+                const btnText = loginBtn.find('.btn-text');
+                const spinner = loginBtn.find('.spinner-border');
+
+                // Show loading state
+                btnText.text('Signing In...');
+                spinner.removeClass('d-none');
+                loginBtn.prop('disabled', true);
+
+                const formData = {
+                    username: $('#username').val(),
+                    password: $('#password').val()
+                };
+
+                $.ajax({
+                    url: '{% url "account:login_ajax" %}',
+                    type: 'POST',
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            // Hide login form and show logged in content
+                            hideLoginForm();
+                            showLoggedInContent(response.username);
+                        } else {
+                            showErrors(response.errors);
+                        }
+                    },
+                    error: function() {
+                        showErrors({'__all__': ['Network error. Please try again.']});
+                    },
+                    complete: function() {
+                        // Reset button state
+                        btnText.text('Sign In');
+                        spinner.addClass('d-none');
+                        loginBtn.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Handle logout button click
+            $('#logoutBtn').on('click', function() {
+                const logoutBtn = $('#logoutBtn');
+                const btnText = logoutBtn.find('.btn-text');
+                const spinner = logoutBtn.find('.spinner-border');
+
+                // Show loading state
+                btnText.text('Signing Out...');
+                spinner.removeClass('d-none');
+                logoutBtn.prop('disabled', true);
+
+                $.ajax({
+                    url: '{% url "account:logout_ajax" %}',
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            // Hide logged in content and show login form
+                            hideLoggedInContent();
+                            showLoginForm();
+                        }
+                    },
+                    error: function() {
+                        alert('Network error. Please try again.');
+                    },
+                    complete: function() {
+                        // Reset button state
+                        btnText.text('Logout');
+                        spinner.addClass('d-none');
+                        logoutBtn.prop('disabled', false);
+                    }
+                });
+            });
+
+            function checkAuthStatus() {
+                $.ajax({
+                    url: '{% url "account:user_status" %}',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#loading-state').hide();
+
+                        if (response.authenticated) {
+                            showLoggedInContent(response.username);
+                        } else {
+                            showLoginForm();
+                        }
+                    },
+                    error: function() {
+                        $('#loading-state').hide();
+                        showLoginForm();
+                    }
+                });
+            }
+
+            function showLoginForm() {
+                $('#logged-in-content').hide();
+                $('#login-form').fadeIn(300);
+                clearForm();
+            }
+
+            function hideLoginForm() {
+                $('#login-form').fadeOut(300);
+            }
+
+            function showLoggedInContent(username) {
+                $('#login-form').hide();
+                $('#username-display').text(username);
+                $('#logged-in-content').fadeIn(300);
+            }
+
+            function hideLoggedInContent() {
+                $('#logged-in-content').fadeOut(300);
+            }
+
+            function showErrors(errors) {
+                let errorHtml = '';
+                for (let field in errors) {
+                    if (Array.isArray(errors[field])) {
+                        errors[field].forEach(function(error) {
+                            errorHtml += '<div>' + error + '</div>';
+                        });
+                    } else {
+                        errorHtml += '<div>' + errors[field] + '</div>';
+                    }
+                }
+                $('#login-errors').html(errorHtml).show();
+            }
+
+            function clearForm() {
+                $('#loginForm')[0].reset();
+                $('#login-errors').hide();
+            }
+        });
+    </script>
+</body>
+</html>
