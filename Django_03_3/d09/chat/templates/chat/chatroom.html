@@ -36,7 +36,35 @@
         backdrop-filter: blur(10px);
         border-left: 1px solid rgba(0, 0, 0, 0.1);
         border-right: 1px solid rgba(0, 0, 0, 0.1);
+        max-height: 500px; /* Fixed height for Exercise 04 */
+        min-height: 300px; /* Minimum height to ensure visibility */
+        scroll-behavior: smooth; /* Smooth scrolling */
     }
+
+    /* Custom scrollbar styling (Exercise 04) */
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    .chat-messages::-webkit-scrollbar-track {
+        background: rgba(233, 236, 239, 0.5);
+        border-radius: 10px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(45deg, #5a67d8, #6b46c1);
+        transform: scale(1.1);
+    }
+
+    /* Firefox scrollbar styling */
+    .chat-messages {
+        scrollbar-width: thin;
+        scrollbar-color: #667eea rgba(233, 236, 239, 0.5);
+    }
+
     .chat-input {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 0 0 15px 15px;
@@ -153,7 +181,7 @@
         text-decoration: none;
         transform: translateY(-2px);
     }
-    
+
     /* User list styles (Exercise 03) */
     .chat-content {
         display: flex;
@@ -349,9 +377,12 @@ $(document).ready(function() {
         chatSocket.close();
     });
 
-    // Auto-scroll to bottom
+    // Auto-scroll to bottom (Exercise 04)
     function scrollToBottom() {
-        chatMessages.scrollTop(chatMessages[0].scrollHeight);
+        // Always scroll to bottom for latest messages
+        chatMessages.animate({
+            scrollTop: chatMessages[0].scrollHeight
+        }, 300); // 300ms smooth animation
     }
 
     // Add a user message (message de l'utilisateur actuel)
@@ -365,6 +396,8 @@ $(document).ready(function() {
             </div>
         `;
         chatMessages.append(messageHtml);
+
+        // Always scroll to bottom for new messages (Exercise 04)
         scrollToBottom();
     }
 
@@ -379,6 +412,8 @@ $(document).ready(function() {
             </div>
         `;
         chatMessages.append(messageHtml);
+
+        // Always scroll to bottom for new messages (Exercise 04)
         scrollToBottom();
     }
 
@@ -390,6 +425,7 @@ $(document).ready(function() {
             </div>
         `;
         chatMessages.append(messageHtml);
+        // Always scroll to bottom for system messages (Exercise 04)
         scrollToBottom();
     }
 
@@ -397,10 +433,10 @@ $(document).ready(function() {
     function updateUserList(users) {
         const userListContainer = $('#user-list-container');
         const userCount = $('#user-count');
-        
+
         // Clear current list
         userListContainer.empty();
-        
+
         // Add each user
         users.forEach(function(user) {
             const isCurrentUser = user === username;
@@ -411,7 +447,7 @@ $(document).ready(function() {
             `;
             userListContainer.append(userHtml);
         });
-        
+
         // Update user count
         const countText = users.length === 1 ? '1 user online' : `${users.length} users online`;
         userCount.text(countText);
