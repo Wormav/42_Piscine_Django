@@ -1,8 +1,7 @@
-import os
-
 TXT_FILE = "periodic_table.txt"
 HTML_FILE = "periodic_table.html"
 CSS_FILE = "periodic_table.css"
+
 
 def parse_elements(filename):
     elements = []
@@ -19,6 +18,7 @@ def parse_elements(filename):
             attr_dict["name"] = name
             elements.append(attr_dict)
     return elements
+
 
 def build_table(elements):
     max_row = 7
@@ -46,10 +46,11 @@ def build_table(elements):
             table[r].append(None)
     return table
 
+
 def html_element_cell(e):
     if not e:
-        return '<td></td>'
-    return f'''<td class="element">
+        return "<td></td>"
+    return f"""<td class="element">
     <h4>{e["name"]}</h4>
     <ul>
       <li>No {e["number"]}</li>
@@ -57,10 +58,11 @@ def html_element_cell(e):
       <li>{e["molar"]}</li>
       <li>{e["electron"]} electron</li>
     </ul>
-  </td>'''
+  </td>"""
+
 
 def generate_html(table):
-    html = '''<!DOCTYPE html>
+    html = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -69,20 +71,21 @@ def generate_html(table):
 </head>
 <body>
   <table>
-'''
+"""
     for row in table:
         html += "    <tr>\n"
         for cell in row:
             html += "      " + html_element_cell(cell) + "\n"
         html += "    </tr>\n"
-    html += '''  </table>
+    html += """  </table>
 </body>
 </html>
-'''
+"""
     return html
 
+
 def generate_css():
-    return '''
+    return """
 table {
   border-collapse: collapse;
 }
@@ -102,7 +105,8 @@ ul {
   padding-left: 0;
   margin: 0;
 }
-'''
+"""
+
 
 def main():
     elements = parse_elements(TXT_FILE)
@@ -114,6 +118,7 @@ def main():
     with open(CSS_FILE, "w") as f:
         f.write(css)
     print(f"Files génered : {HTML_FILE}, {CSS_FILE}")
+
 
 if __name__ == "__main__":
     main()
